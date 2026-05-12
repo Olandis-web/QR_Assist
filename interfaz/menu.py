@@ -1,22 +1,32 @@
 import flet as ft
+from interfaz.vista_empleados import vista_empleados
+from interfaz.vista_usuarios import vista_usuarios
 
-def vista_menu (page):
+
+def vista_menu(page):
     '''Esta funcion muestra el menu principal, con la division de la barra lateral y la parte del contenido.
     La barra lateral contiene los atajos hacia los formularios para hacer las acciones del sistema'''
 
+    def cambio_menu(contenido):
+        '''Esta funcion se encarga de lograr el cambio de pagina 
+        hacia los elementos elgidos'''
+
+        area_principal.content = contenido
+        page.update()
+
     area_principal = ft.Container(
         expand = True,
-        bgcolor = ft.Colors.BLUE_GREY_800,
-        padding = 20,
-        content = ft.Text("Selecciona una opcion del menu", color = "white")
+        bgcolor = ft.Colors.BLUE_GREY_900,
+        padding = 10,
     )
 
 
     barra = ft.Container(
         width = 250,
         padding = 20,
-        bgcolor = ft.Colors.BLUE_GREY_800,
+        bgcolor = ft.Colors.BLUE_GREY_700,
         content = ft.Column([
+            
             ft.Row(
                 controls= [
                     ft.Icon(ft.Icons.QR_CODE, color = "white", size = 35),
@@ -27,41 +37,69 @@ def vista_menu (page):
 
             ft.Divider(color = ft.Colors.WHITE24),
     
-            ft.ExpansionTile(
-                leading = ft.Icon(ft.Icons.BADGE, color = "white", size = 22),
-                title = ft.Text ("Empleados"),
-                controls_padding = ft.padding.only(left = 36),
-                controls = [
-                    ft.ListTile(title=ft.Text("Insertar", color="white")),
-                    ft.ListTile(title=ft.Text("Actualizar", color = "white")),
-                    ft.ListTile(title=ft.Text("Eliminar", color = "white"))
-                ]
+            ft.ElevatedButton(
+                "Empleados",
+                icon = ft.Icons.BADGE,
+                width = 200,
+                height = 45,
+                style = ft.ButtonStyle(
+                    shape = ft.RoundedRectangleBorder(radius = 5),
+                ),
+                on_click = lambda e: cambio_menu(vista_empleados())
+            
+            ),
+                
+
+            ft.ElevatedButton(
+                "Asistencia",
+                icon = ft.Icons.WATCH_LATER,
+                width = 200,
+                height = 45,
+                style = ft.ButtonStyle(
+                    shape = ft.RoundedRectangleBorder(radius = 5),
+                ),
+                on_click = lambda e: cambio_menu(
+                    ft.Text("Seccion Asistencia", color = "white")
+
+                )
+           
             ),
 
-            ft.ExpansionTile(
-                leading = ft.Icon(ft.Icons.WATCH_LATER , color = "white", size = 22),
-                title = ft.Text("Asistencia"),
-                controls_padding = ft.padding.only(left = 36),
+            ft.ElevatedButton(
+                "Usuarios",
+                icon = ft.Icons.PERSON,
+                width = 200,
+                height = 45,
+                style = ft.ButtonStyle(
+                    shape = ft.RoundedRectangleBorder(radius = 5),
+                ),
+                on_click = lambda e: cambio_menu(vista_usuarios())
             ),
 
-            ft.ExpansionTile(
-                leading = ft.Icon(ft.Icons.PERSON, color = "white", size = 22),
-                title = ft.Text("Usuarios"),
-                controls_padding = ft.padding.only(left = 36),
-                controls = [
-                    ft.ListTile(title=ft.Text("Insertar", color ="white", )),
-                    ft.ListTile(title=ft.Text("Actualizar", color = "white")),
-                    ft.ListTile(title=ft.Text("Eliminar", color = "White"))
-                ],
-            ),
+            ft.ElevatedButton(
+                "Generar QRs",
+                icon = ft.Icons.QR_CODE_2,
+                width = 200,
+                height = 54,
+                style = ft.ButtonStyle(
+                    shape = ft.RoundedRectangleBorder(radius = 5),
+                ),
+                on_click = lambda e: cambio_menu(
+                    ft.Text("Seccion Generacion de QR", color = "white")
+                )
+            ),      
 
-            ft.ExpansionTile(
-                leading = ft.Icon(ft.Icons.REPORT , color = "white", size = 22),
-                title = ft.Text("Reportes"),
-                controls_padding = ft.padding.only(left = 36),
-                controls = [
-                    ft.ListTile(title = ft.Text("Semanal", color = "White")),
-                ]
+            ft.ElevatedButton(
+                "Reportes",
+                icon = ft.Icons.REPORT,
+                width = 200,
+                height = 54,
+                style = ft.ButtonStyle(
+                    shape = ft.RoundedRectangleBorder(radius = 5),
+                ),
+                on_click = lambda e: cambio_menu(
+                    ft.Text("Seccion Reportes", color = "white")
+                )
             ),      
 
             ft.Container(expand = True),
@@ -87,11 +125,6 @@ def vista_menu (page):
     expand = True
     )
 
-    def cambio_menu(contenido):
-        '''Esta funcion se encarga de lograr el cambio de pagina 
-        hacia los elementos elgidos'''
 
-        area_principal.content = contenido
-        page.update()
-        
+       
     
