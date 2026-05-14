@@ -16,7 +16,7 @@ def vista_empleados():
         )
     
     cargo = ft.TextField(
-        label = "Cargo", 
+        label = "Cargo",
         border_color = "white"
         )
         
@@ -34,12 +34,40 @@ def vista_empleados():
             ft.dropdown.Option("Licencia")
         ]
     )
+
+    def buscar(e):
+        """Funcion para hacer funcionar la barra de busqueda"""
+        
+        nom = busqueda.value.lower()
+        datatable.rows.clear()
+
+        for empleado in empleados.obtener_datos():
+            nombre = f"{empleado [1]} {empleado[2]}".lower()
+
+            if nom in nombre:
+                datatable.rows.append(
+                    ft.DataRow(
+                        on_select_change = lambda e, empleado = empleado:
+                        seleccionar(empleado),
+
+                        cells = [
+                            ft.DataCell(ft.Text(f"{empleado[0]}", color = "white")),
+                            ft.DataCell(ft.Text(f"{empleado[1]}", color = "white")),
+                            ft.DataCell(ft.Text(f"{empleado[2]}", color = "white")),
+                            ft.DataCell(ft.Text(f"{empleado[3]}", color = "white")),
+                            ft.DataCell(ft.Text(f"{empleado[4]}", color = "white")),
+                            ft.DataCell(ft.Text(f"{empleado[5]}", color = "white")),
+                        ]
+                    )
+                )
+                datatable.update()
                                 
     busqueda = ft.TextField(
         label = "Buscar por nombre",
         suffix_icon = ft.Icons.SEARCH,
         border = ft.InputBorder.UNDERLINE,
-        label_style = ft.TextStyle(color = "white")
+        label_style = ft.TextStyle(color = "white"),
+        on_submit = buscar
     )
 
     id_empleado = None
@@ -68,23 +96,23 @@ def vista_empleados():
         datatable.rows.clear()
         for empleado in empleados.obtener_datos():
 
-            datatable.rows.append(
+                datatable.rows.append(
 
-                ft.DataRow(
+                    ft.DataRow(
 
-                    on_select_change = lambda e, empleado = empleado:
-                    seleccionar(empleado),
+                        on_select_change = lambda e, empleado = empleado:
+                        seleccionar(empleado),
 
-                    cells = [
-                        ft.DataCell(ft.Text(f"{empleado[0]}", color = "white")),
-                        ft.DataCell(ft.Text(f"{empleado[1]}", color = "white")),
-                        ft.DataCell(ft.Text(f"{empleado[2]}", color = "white")),
-                        ft.DataCell(ft.Text(f"{empleado[3]}", color = "white")),
-                        ft.DataCell(ft.Text(f"{empleado[4]}", color = "white")),
-                        ft.DataCell(ft.Text(f"{empleado[5]}", color = "white")),
-                    ]
-                ) 
-            )
+                        cells = [
+                            ft.DataCell(ft.Text(f"{empleado[0]}", color = "white")),
+                            ft.DataCell(ft.Text(f"{empleado[1]}", color = "white")),
+                            ft.DataCell(ft.Text(f"{empleado[2]}", color = "white")),
+                            ft.DataCell(ft.Text(f"{empleado[3]}", color = "white")),
+                            ft.DataCell(ft.Text(f"{empleado[4]}", color = "white")),
+                            ft.DataCell(ft.Text(f"{empleado[5]}", color = "white")),
+                        ]
+                    ) 
+                )
 
 
     def mensaje(page, mensaje):
