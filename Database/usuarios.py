@@ -57,3 +57,22 @@ def eliminar_usuario(id_usuario):
                    )
     conectar.commit()
     conectar.close()
+
+def validar(username, contrasena):
+    """Funcion para validar el inicion de sesion de los usuarios"""
+
+    conectar = conexion.conexion()
+    cursor = conectar.cursor()
+
+    cursor.execute("""Select * FROM Usuarios 
+                   Where Username = ? 
+                   AND Contraseña = ?""",
+
+                   (username, contrasena)
+                )
+    
+    usuario = cursor.fetchone()
+    conectar.close()
+
+    return usuario
+    

@@ -24,7 +24,7 @@ def vista_menu(page):
     barra = ft.Container(
         width = 250,
         padding = 20,
-        bgcolor = ft.Colors.BLUE_GREY_700,
+        bgcolor = ft.Colors.BLUE_GREY_800,
         content = ft.Column([
             
             ft.Row(
@@ -124,7 +124,3 @@ def vista_menu(page):
     ],
     expand = True
     )
-
-
-       
-    

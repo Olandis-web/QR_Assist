@@ -1,5 +1,5 @@
 import flet as ft
-from interfaz import menu
+from interfaz import login
 
 def main(page: ft.Page):
     '''Se encarga de insertar las caracteristicas principales de la pagina 
@@ -7,9 +7,9 @@ def main(page: ft.Page):
 
     page.title = "QR Assist"
     page.bgcolor = ft.Colors.BLUE_GREY_900
-    page.window.maximized = True
+    page.window.windowed = True
 
-    page.add(menu.vista_menu(page))
+    page.add(login.login(page))
 
-ft.app(target= main)
+ft.run(main)
 
