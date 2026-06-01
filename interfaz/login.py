@@ -1,5 +1,6 @@
 import flet as ft
 from database import usuarios
+from interfaz import vista_limitacion
 import asyncio
 
 
@@ -36,11 +37,20 @@ def login(page: ft.Page):
             page.update()
             page.controls.clear()
 
-            from interfaz.menu import vista_menu
+            rol = resultado[6]
+
+            if rol =="Administrador":
             
-            page.add(vista_menu(page))
-            page.update()
-        
+                from interfaz.menu import vista_menu
+                
+                page.add(vista_menu(page))
+                page.update()
+
+            else: 
+                from interfaz.vista_limitacion import menu_limite
+                page.add(menu_limite(page))
+                page.update()
+                       
         else: 
             snack = ft.SnackBar(
                 content = ft.Text("Usuario o Contraseña no encontrado", color = "white"),

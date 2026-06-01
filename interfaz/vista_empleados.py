@@ -1,6 +1,7 @@
 import flet as ft
 from database import conexion
 from database import empleados
+from database import usuarios
 
 def vista_empleados():
     '''Muestra el contenido de el formulario de empleados.'''
@@ -45,6 +46,11 @@ def vista_empleados():
             nombre = f"{empleado [1]} {empleado[2]}".lower()
 
             if nom in nombre:
+
+                usuario_existente = usuarios.verifica_usuario(
+                    empleado[0]
+                )
+
                 datatable.rows.append(
                     ft.DataRow(
                         on_select_change = lambda e, empleado = empleado:
@@ -57,6 +63,25 @@ def vista_empleados():
                             ft.DataCell(ft.Text(f"{empleado[3]}", color = "white")),
                             ft.DataCell(ft.Text(f"{empleado[4]}", color = "white")),
                             ft.DataCell(ft.Text(f"{empleado[5]}", color = "white")),
+
+                            ft.DataCell(
+                                ft.IconButton(
+                                    icon = ft.Icons.PERSON_ADD,
+                                    tooltip = "Crear Usuario",
+                                    icon_color = "white",
+
+                                    on_click = lambda e, 
+                                    empleado = empleado:
+
+                                    creacion_usuario(e, empleado)
+
+                                )
+                                if not usuario_existente 
+                                
+                                else 
+                                    ft.Text("Listo",color = "green")
+                            )
+                            
                         ]
                     )
                 )
@@ -95,6 +120,10 @@ def vista_empleados():
 
         datatable.rows.clear()
         for empleado in empleados.obtener_datos():
+                
+                usuario_existente = usuarios.verifica_usuario(
+                    empleado[0]
+                )
 
                 datatable.rows.append(
 
@@ -110,6 +139,23 @@ def vista_empleados():
                             ft.DataCell(ft.Text(f"{empleado[3]}", color = "white")),
                             ft.DataCell(ft.Text(f"{empleado[4]}", color = "white")),
                             ft.DataCell(ft.Text(f"{empleado[5]}", color = "white")),
+
+                            ft.DataCell(
+                                ft.IconButton(
+                                    icon = ft.Icons.PERSON_ADD,
+                                    tooltip = "Crear Usuario",
+                                    icon_color = "white",
+
+                                    on_click = lambda e,
+                                    empleado = empleado:
+
+                                    creacion_usuario(e, empleado)
+                                )
+                                if not usuario_existente
+
+                                else
+                                ft.Text("Listo", color = "green")
+                            )
                         ]
                     ) 
                 )
@@ -270,11 +316,46 @@ def vista_empleados():
         dialog.open = True
         e.page.update()
 
+    def creacion_usuario(e, empleado):
+        """Permite crear el usuario de un empleado"""
+
+        existencia = usuarios.verifica_usuario(
+            empleado[0]
+        )
+
+        if existencia:
+            snack = ft.SnackBar(
+                content = ft.Text(
+                    "Este empleado ya tiene usuario",
+                    color = "white"
+                ),
+                bgcolor = "red",
+                open = True
+            )
+
+            e.page.overlay.append(snack)
+            e.page.update()
+
+            return
+
+        from interfaz.vista_usuarios import vista_usuarios
+
+        e.page.clear()
+        e.page.add(
+            vista_usuarios(
+                e.page,
+                empleado[0],
+                empleado[1],
+                empleado[2]
+            )
+        )
+        e.page.update()
+
         
     datatable = ft.DataTable(
         expand = True,
-        column_spacing = 100,
-        horizontal_margin = 40,
+        column_spacing = 50,
+        horizontal_margin = 30,
         border = ft.Border.all(2, "white"),
         data_row_color = {ft.ControlState.SELECTED: "white",
                           ft.ControlState.PRESSED: "blue"},
@@ -286,7 +367,8 @@ def vista_empleados():
                             ft.DataColumn(ft.Text("Apellidos", color = "white", weight = "bold")),
                             ft.DataColumn(ft.Text("Cargo", color = "white", weight = "bold")),
                             ft.DataColumn(ft.Text("QR", color = "white", weight = "bold")),
-                            ft.DataColumn(ft.Text("Estado", color = "white", weight = "bold"))
+                            ft.DataColumn(ft.Text("Estado", color = "white", weight = "bold")),
+                            ft.DataColumn(ft.Text("Acciones", color = "white", weight = "bold"))
                           ],
 
                         rows = []

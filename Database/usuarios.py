@@ -16,15 +16,15 @@ def obtener_datos():
     return datos
 
 
-def insertar_usuario(nombres, apellidos, username, contrasena, rol):
+def insertar_usuario(id_empleado, nombres, apellidos, username, contrasena, rol):
     """Funcion que inserta informacion a la base de datos mediante el formularion de usuarios"""
     
     conectar = conexion.conexion()
     cursor = conectar.cursor()
 
     cursor.execute(
-        "EXEC Inserta_Usuario ?, ?, ?, ?, ?",
-        (nombres, apellidos, username, contrasena, rol)
+        "EXEC Inserta_Usuario ?, ?, ?, ?, ?, ?",
+        (id_empleado, nombres, apellidos, username, contrasena, rol)
     )
 
     conectar.commit()
@@ -32,14 +32,14 @@ def insertar_usuario(nombres, apellidos, username, contrasena, rol):
 
     
 
-def actualizar_usuario(id_usuario, nombres, apellidos, username, contrasena, rol):
+def actualizar_usuario(id_usuario,id_empleado, nombres, apellidos, username, contrasena, rol):
     """Funcion que actualiza informacion a la base de datos mediante el formularion de usuarios"""
 
     conectar = conexion.conexion()
     cursor = conectar.cursor()
 
-    cursor.execute("EXEC Actualiza_Usuario ?, ?, ?, ?, ?, ?",
-                   (id_usuario, nombres, apellidos, username, contrasena, rol)
+    cursor.execute("EXEC Actualiza_Usuario ?, ?, ?, ?, ?, ?, ?",
+                   (id_usuario, id_empleado, nombres, apellidos, username, contrasena, rol)
                    )
 
     conectar.commit()
@@ -75,4 +75,17 @@ def validar(username, contrasena):
     conectar.close()
 
     return usuario
+
+def verifica_usuario(id_empleado):
+    """Verifica si un empleado ya es un usuario"""
+
+    conectar = conexion.conexion()
+    cursor = conectar.cursor()
+
+    cursor.execute("Select * from usuarios WHERE ID_Empleado = ?",(id_empleado,))
+
+    resultado = cursor.fetchone()
+    conectar.close()
+
+    return resultado
     

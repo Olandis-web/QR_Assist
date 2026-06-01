@@ -2,19 +2,21 @@ import flet as ft
 from database import conexion
 from database import usuarios
 
-def vista_usuarios():
+def vista_usuarios(page, id_empleado = None, nombres = "", apellidos = ""):
     '''Muestra el contenido de el formulario de usuarios.'''
 
     nombre = ft.TextField(
+        value = nombres,
         label = "Nombres", 
         border_color = "white"
         )
     
     apellido = ft.TextField(
+        value = apellidos,
         label = "Apellidos", 
         border_color = "white"
         )
-    
+ 
     username = ft.TextField(
         label = "UserName", 
         border_color = "white"
@@ -70,6 +72,8 @@ def vista_usuarios():
     )
 
     id_usuario = None
+    empleado_id = id_empleado
+
     def seleccionar(usuario):
         """Funcion que permite seleccionar los datos de las tablas y que 
         aparezcan en el formulario"""
@@ -77,11 +81,11 @@ def vista_usuarios():
         nonlocal id_usuario
         id_usuario = usuario[0]
 
-        nombre.value = usuario[1]
-        apellido.value = usuario[2]
-        username.value = usuario[3]
-        contrasena.value = usuario[4]
-        rol.value = usuario[5]
+        nombre.value = usuario[2]
+        apellido.value = usuario[3]
+        username.value = usuario[4]
+        contrasena.value = usuario[5]
+        rol.value = usuario[6]
         
         nombre.update()
         apellido.update()
@@ -101,6 +105,7 @@ def vista_usuarios():
                     ft.DataCell(ft.Text(f"{usuario[3]}", color = "white")),
                     ft.DataCell(ft.Text(f"{usuario[4]}", color = "white")),
                     ft.DataCell(ft.Text(f"{usuario[5]}", color = "white")),
+                    ft.DataCell(ft.Text(f"{usuario[6]}", color = "white")),
                 ]
             )
             for usuario in usuarios.obtener_datos()
@@ -126,6 +131,7 @@ def vista_usuarios():
                             ft.DataCell(ft.Text(f"{usuario[3]}", color = "white")),
                             ft.DataCell(ft.Text(f"{usuario[4]}", color = "white")),
                             ft.DataCell(ft.Text(f"{usuario[5]}", color = "white")),
+                            ft.DataCell(ft.Text(f"{usuario[6]}", color = "white")),
                         ]
                     ) 
                 )
@@ -144,7 +150,6 @@ def vista_usuarios():
 
     def limpiar():
         """Esta funcion limpia el formulario luego de realizar cualquier accion"""
-
         nombre.value = ""
         apellido.value = ""
         username.value = ""
@@ -164,6 +169,7 @@ def vista_usuarios():
         la tabla del modulo"""
 
         usuarios.insertar_usuario(
+            empleado_id,
             nombre.value,
             apellido.value,
             username.value,
@@ -202,6 +208,7 @@ def vista_usuarios():
 
             usuarios.actualizar_usuario(
                 id_usuario,
+                empleado_id,
                 nombre.value,
                 apellido.value,
                 username.value,
@@ -285,8 +292,8 @@ def vista_usuarios():
 
     datatable = ft.DataTable(
         expand = True,
-        column_spacing = 90,
-        horizontal_margin = 40,
+        column_spacing = 70,
+        horizontal_margin = 30,
         border = ft.Border.all(2, "white"),
         data_row_color = {ft.ControlState.SELECTED: "white",
                           ft.ControlState.PRESSED: "blue"},
@@ -294,6 +301,7 @@ def vista_usuarios():
 
                           columns = [
                             ft.DataColumn(ft.Text("ID", color = "white", weight = "bold")),
+                            ft.DataColumn(ft.Text("ID_Empleado", color = "white", weight = "bold")),
                             ft.DataColumn(ft.Text("Nombres", color = "white", weight = "bold")),
                             ft.DataColumn(ft.Text("Apellidos", color = "white", weight = "bold")),
                             ft.DataColumn(ft.Text("Username", color = "white", weight = "bold")),

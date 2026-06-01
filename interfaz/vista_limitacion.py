@@ -3,7 +3,7 @@ from interfaz.vista_empleados import vista_empleados
 from interfaz.vista_usuarios import vista_usuarios
 
 
-def vista_menu(page):
+def menu_limite(page):
     '''Esta funcion muestra el menu principal, con la division de la barra lateral y la parte del contenido.
     La barra lateral contiene los atajos hacia los formularios para hacer las acciones del sistema'''
 
@@ -36,18 +36,6 @@ def vista_menu(page):
             ),
 
             ft.Divider(color = ft.Colors.WHITE24),
-    
-            ft.ElevatedButton(
-                "Empleados",
-                icon = ft.Icons.BADGE,
-                width = 200,
-                height = 45,
-                style = ft.ButtonStyle(
-                    shape = ft.RoundedRectangleBorder(radius = 5),
-                ),
-                on_click = lambda e: cambio_menu(vista_empleados())
-            
-            ),
                 
 
             ft.ElevatedButton(
@@ -65,43 +53,6 @@ def vista_menu(page):
            
             ),
 
-            ft.ElevatedButton(
-                "Usuarios",
-                icon = ft.Icons.PERSON,
-                width = 200,
-                height = 45,
-                style = ft.ButtonStyle(
-                    shape = ft.RoundedRectangleBorder(radius = 5),
-                ),
-                on_click = lambda e: cambio_menu(vista_usuarios(page))
-            ),
-
-            ft.ElevatedButton(
-                "Generar QRs",
-                icon = ft.Icons.QR_CODE_2,
-                width = 200,
-                height = 54,
-                style = ft.ButtonStyle(
-                    shape = ft.RoundedRectangleBorder(radius = 5),
-                ),
-                on_click = lambda e: cambio_menu(
-                    ft.Text("Seccion Generacion de QR", color = "white")
-                )
-            ),      
-
-            ft.ElevatedButton(
-                "Reportes",
-                icon = ft.Icons.REPORT,
-                width = 200,
-                height = 54,
-                style = ft.ButtonStyle(
-                    shape = ft.RoundedRectangleBorder(radius = 5),
-                ),
-                on_click = lambda e: cambio_menu(
-                    ft.Text("Seccion Reportes", color = "white")
-                )
-            ),      
-
             ft.Container(expand = True),
             ft.Divider(color = ft.Colors.WHITE24),
 
@@ -110,8 +61,8 @@ def vista_menu(page):
                     content = ft.Text("AD", color = "white"),
                     bgcolor = ft.Colors.BLUE_700,
                 ),
-                title = ft.Text("Administrador", color = "white", size = 13),
-                subtitle = ft.Text("admin@QrAssist.com", color = "white54", size = 11)
+                title = ft.Text("Nombre Apellido", color = "white", size = 13),
+                subtitle = ft.Text("empleado@QrAssist.com", color = "white54", size = 11)
             )
 
         ])  
