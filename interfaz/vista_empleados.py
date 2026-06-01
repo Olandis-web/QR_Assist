@@ -340,15 +340,12 @@ def vista_empleados():
 
         from interfaz.vista_usuarios import vista_usuarios
 
-        e.page.clear()
-        e.page.add(
-            vista_usuarios(
+        e.page.controls[0].controls[1].content = vista_usuarios(
                 e.page,
                 empleado[0],
                 empleado[1],
                 empleado[2]
             )
-        )
         e.page.update()
 
         
@@ -483,6 +480,6 @@ def volver_menu(page):
 
     from interfaz.menu import vista_menu
     
-    page.controls.clear()
+    page.controls.clean()
     page.add(vista_menu(page))
     page.update()
