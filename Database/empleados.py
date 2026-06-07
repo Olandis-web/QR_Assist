@@ -1,5 +1,5 @@
 import pyodbc
-from database import conexion
+from Database import conexion
 
 def obtener_datos():
     """Esta funcion muestra la informacion de la base de datos en la tabla"""
@@ -58,3 +58,19 @@ def eliminar_empleado(id_empleado):
     conectar.close()
 
 
+def buscar_empleado(id_empleado):
+    """Funcion que busca un empleado por su ID para mostrar su nombre al leer el QR"""
+        
+    conectar = conexion.conexion()
+    cursor = conectar.cursor()
+            
+    cursor.execute("""
+         SELECT Nombres, Apellidos
+         FROM Empleados
+         WHERE ID_Empleado = ?      
+         """, (id_empleado,))
+    empleado = cursor.fetchone()
+    conectar.close()
+    return empleado
+        
+  
