@@ -1,6 +1,5 @@
-
 import flet as ft
-from interfaz_usuario import menu_usuario
+from interfaz import login
 
 def main(page: ft.Page):
     '''Se encarga de insertar las caracteristicas principales de la pagina 
@@ -10,7 +9,7 @@ def main(page: ft.Page):
     page.bgcolor = ft.Colors.BLUE_GREY_900
     page.window.maximized = True
 
-    page.add(menu_usuario.vista_menu(page))
+    page.add(login.login(page))
 
 ft.run(main)
 
