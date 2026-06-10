@@ -1,5 +1,5 @@
 import pyodbc
-from Database import conexion
+from database import conexion
 
 def obtener_datos():
     """Esta funcion muestra la informacion de la base de datos en la tabla"""

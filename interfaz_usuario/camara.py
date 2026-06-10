@@ -9,8 +9,8 @@ import openpyxl as xl
 import os
 from datetime import datetime
 from pyzbar.pyzbar import decode
-from Database import conexion
-from Database.empleados import buscar_empleado
+from database import conexion
+from database.empleados import buscar_empleado
 from openpyxl.styles import Font, PatternFill, Border, Side, Alignment
 
 

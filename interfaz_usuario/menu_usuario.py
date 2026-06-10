@@ -1,5 +1,5 @@
 import flet as ft
-from interfaz.camara import CamaraApp
+from interfaz_usuario.camara import CamaraApp
 
 
 def vista_menu(page :ft.Page):

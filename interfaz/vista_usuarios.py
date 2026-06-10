@@ -419,7 +419,7 @@ def volver_menu(page):
     """Esta funcion se encarga de volver al menu principal luego de realizar cualquier
     accion dentro de esta vista"""
 
-    from interfaz.menu import vista_menu
+    from interfaz_usuario.menu_usuario import vista_menu
     
     page.controls.clear()
     page.add(vista_menu(page))

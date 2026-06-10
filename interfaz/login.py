@@ -41,7 +41,7 @@ def login(page: ft.Page):
 
             if rol =="Administrador":
             
-                from interfaz.menu import vista_menu
+                from interfaz_usuario.menu_usuario import vista_menu
                 
                 page.add(vista_menu(page))
                 page.update()
