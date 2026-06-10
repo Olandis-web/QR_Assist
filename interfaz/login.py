@@ -1,6 +1,6 @@
 import flet as ft
 from database import usuarios
-from interfaz import vista_limitacion
+from interfaz_usuario import menu_usuario
 import asyncio
 
 
