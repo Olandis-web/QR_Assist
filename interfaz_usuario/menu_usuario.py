@@ -2,7 +2,7 @@ import flet as ft
 from interfaz_usuario.camara import CamaraApp
 
 
-def vista_menu(page :ft.Page):
+def vista_menu(page :ft.Page, id_empleado_login):
     
     '''Esta funcion muestra el menu principal, con la division de la barra lateral y la parte del contenido.
     '''
@@ -72,7 +72,7 @@ def vista_menu(page :ft.Page):
                 style = ft.ButtonStyle(
                     shape = ft.RoundedRectangleBorder(radius = 5),
                 ),
-                on_click = lambda e: cambio_menu(CamaraApp(page))
+                on_click = lambda e: cambio_menu(CamaraApp(page,id_empleado_login))
            
             ),
 

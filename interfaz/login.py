@@ -18,6 +18,9 @@ def login(page: ft.Page):
 
         if resultado:
 
+            id_empleado_login = resultado[1]
+            rol = resultado[6]
+
             carga = ft.AlertDialog(
                 modal = True,
                 content = ft.Row(
@@ -48,7 +51,7 @@ def login(page: ft.Page):
 
             else: 
                 from interfaz_usuario.menu_usuario import vista_menu
-                page.add(vista_menu(page))
+                page.add(vista_menu(page, id_empleado_login))
                 page.update()
                        
         else: 

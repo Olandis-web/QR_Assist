@@ -16,19 +16,18 @@ from openpyxl.styles import Font, PatternFill, Border, Side, Alignment
 
 class CamaraApp(ft.Container):
     
-    def __init__(self, page):
+    def __init__(self, page, id_empleado_login):
         super().__init__(expand=True)
         self.bgcolor = ft.Colors.BLUE_GREY_900 
         self.alignment = ft.Alignment(0, 0)
         
         self.main_page = page
+        self.id_empleado_login = id_empleado_login
         self.is_running = True
         self.capture = None
+
+        self.registro_diario = []
         
-        # Variables de control para evitar registros repetidos
-        self.mañana = []
-        self.tarde = []
-        self.noche = []
         
         #Información mostrada en el panel lateral
         self.lbl_titulo = ft.Text("Información de Asistencia", color="white", size=22, weight="bold")
@@ -129,6 +128,13 @@ class CamaraApp(ft.Container):
                     
                     info = codes.data.decode('utf-8')
                     codigo = int(info)
+
+                    if codigo != self.id_empleado_login:
+                        self.lbl_nombre.value = "QR no autorizado"
+                        self.lbl_nombre.color = ft.Colors.RED
+                        self.lbl_nombre.update()
+
+                        continue
                     
                     pts = np.array([codes.polygon], np.int32)
                     xi, yi = codes.rect.left, codes.rect.top
@@ -154,36 +160,36 @@ class CamaraApp(ft.Container):
                  
                     # Registra de asistencia según el horario de Lunes a Viernes
                     if 4 >= diasem >= 0:
-                        
-                        # Bloque Mañana (Antes de las 12 PM)
-                        if h < 12:
-                            if codigo not in self.mañana:
-                                self.mañana.append(codigo)
-                                self._guardar_excel(nomar, "Mañana", nombre_completo)
-                                cv2.putText(frame, str(codigo),  (xi - 15, yi - 15), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2)
-                            elif codigo in self.mañana:
-                                cv2.putText(frame, 'El ID ' + str(codigo), (xi - 65, yi - 45), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
-                                cv2.putText(frame, 'Fue registrado', (xi - 65, yi - 15), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
-                                
-                        # Bloque Tarde (De 12 PM a 5:59 PM)
-                        elif 12 <= h < 18:
-                            if codigo not in self.tarde:
-                                self.tarde.append(codigo)
-                                self._guardar_excel(nomar, "Tarde", nombre_completo)
-                                cv2.putText(frame, str(codigo), (xi - 15, yi - 15), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2)
-                            elif codigo in self.tarde:
-                                cv2.putText(frame, 'El ID ' + str(codigo), (xi - 65, yi - 45), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
-                                cv2.putText(frame, 'Fue registrado', (xi - 65, yi - 15), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
 
-                        # Bloque Noche (De 6 PM en adelante)
-                        elif h >= 18:
-                            if codigo not in self.noche:
-                                self.noche.append(codigo)
-                                self._guardar_excel(nomar, "Noche", nombre_completo)
-                                cv2.putText(frame, str(codigo), (xi - 15, yi - 15), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2)
-                            elif codigo in self.noche:
-                                cv2.putText(frame, 'El ID ' + str(codigo), (xi - 65, yi - 45), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
-                                cv2.putText(frame, 'Fue registrado', (xi - 65, yi - 15), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+                        hora_actual = datetime.now().time()
+
+                        if hora_actual.hour < 8:
+                            estado = "A Tiempo"
+
+                        elif hora_actual.hour == 8 and hora_actual.minute == 0:
+                            estado = "A Tiempo"
+
+                        else:
+                            estado = "Tarde"
+
+                        if codigo not in self.registro_diario:
+                        
+                            self.registro_diario.append(codigo)
+                        
+                        self._guardar_sql(codigo, estado)
+
+                        self._guardar_excel(nomar, estado, nombre_completo)
+
+                        cv2.putText(
+                            frame,
+                            f"{codigo} - {estado}",
+                            (xi - 15, yi - 15),
+                            cv2.FONT_HERSHEY_SIMPLEX,
+                            1,
+                            (255, 255, 0),
+                            2
+                        )
+
                                 
                 except Exception as e:
                     print(f"Error procesando QR: {e}")
@@ -272,7 +278,48 @@ class CamaraApp(ft.Container):
         except Exception as e:
             print(f"Error escribiendo en Excel: {e}")
     
-   
+
+    def _guardar_sql(self, id_empleado, estado):
+        
+        conn = conexion.conexion()
+        cursor = conn.cursor()
+
+        empleado = buscar_empleado(id_empleado)
+
+        if not empleado:
+            print(f"Empleado{id_empleado} no existe")
+            conn.close()
+            return
+
+        cursor.execute("""SELECT COUNT(*) FROM Asistencia
+                       WHERE ID_Empleado = ?
+                       AND Fecha = CAST(GETDATE() AS DATE)""",(id_empleado,))
+        
+        existe = cursor.fetchone()[0]
+
+        if existe > 0:
+            conn.close()
+            return
+        
+        cursor.execute("""INSERT INTO Asistencia
+                       (
+                        ID_Empleado,
+                        Fecha,
+                        Hora_entrada,
+                        Estado
+                       )
+
+                       VALUES
+                       (
+                        ?,
+                        CAST(GETDATE() AS DATE),
+                        CAST(GETDATE() AS TIME),
+                        ?
+                       )
+                       """, (id_empleado, estado))
+        conn.commit()
+        cursor.close()
+        conn.close()
           
     def detener_camara(self):
         """Esta función detiene la cámara y libera los recursos utilizados"""
