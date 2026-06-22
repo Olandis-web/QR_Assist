@@ -3,7 +3,7 @@ from interfaz.vista_empleados import vista_empleados
 from interfaz.vista_usuarios import vista_usuarios
 
 
-def vista_asistencia():
+def vista_reportes():
     '''Esta funcion muestra el menu principal, con la division de la barra lateral y la parte del contenido.
     La barra lateral contiene los atajos hacia los formularios para hacer las acciones del sistema'''
 

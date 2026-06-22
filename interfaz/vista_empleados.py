@@ -20,11 +20,6 @@ def vista_empleados():
         label = "Cargo",
         border_color = "white"
         )
-        
-    qr = ft.TextField(
-        label = "Codigo QR", 
-        border_color = "white"
-        )
     
     estado = ft.Dropdown(
         label = "Estado", 
@@ -106,13 +101,11 @@ def vista_empleados():
         nombre.value = empleado[1]
         apellido.value = empleado[2]
         cargo.value = empleado[3]
-        qr.value = empleado[4]
         estado.value = empleado[5]
         
         nombre.update()
         apellido.update()
         cargo.update()
-        qr.update()
         estado.update()
 
     def actualiza_tabla():
@@ -179,13 +172,11 @@ def vista_empleados():
         nombre.value = ""
         apellido.value = ""
         cargo.value = ""
-        qr.value = ""
         estado.value = None
 
         nombre.update()
         apellido.update()
         cargo.update()
-        qr.update()
         estado.update()
 
     
@@ -198,7 +189,6 @@ def vista_empleados():
             nombre.value,
             apellido.value,
             cargo.value,
-            qr.value,
             estado.value
         )
 
@@ -237,7 +227,6 @@ def vista_empleados():
                 nombre.value,
                 apellido.value,
                 cargo.value,
-                qr.value,
                 estado.value
             )
             actualiza_tabla()
@@ -413,8 +402,7 @@ def vista_empleados():
                 nombre,
                 apellido,
                 cargo,
-                qr,
-                estado,
+                estado
             ]    
         )      
     )

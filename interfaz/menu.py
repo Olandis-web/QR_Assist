@@ -1,7 +1,8 @@
 import flet as ft
 from interfaz.vista_empleados import vista_empleados
 from interfaz.vista_usuarios import vista_usuarios
-from interfaz.vista_asistencia import vista_asistencia
+from interfaz.vista_reportes import vista_reportes
+from interfaz.vista_generar import vista_generar
 
 def vista_menu(page):
     '''Esta funcion muestra el menu principal, con la division de la barra lateral y la parte del contenido.
@@ -51,14 +52,14 @@ def vista_menu(page):
                 
 
             ft.ElevatedButton(
-                "Asistencia",
+                "Reportes",
                 icon = ft.Icons.WATCH_LATER,
                 width = 200,
                 height = 45,
                 style = ft.ButtonStyle(
                     shape = ft.RoundedRectangleBorder(radius = 5),
                 ),
-                on_click = lambda e: cambio_menu(vista_asistencia())
+                on_click = lambda e: cambio_menu(vista_reportes())
            
             ),
 
@@ -81,23 +82,8 @@ def vista_menu(page):
                 style = ft.ButtonStyle(
                     shape = ft.RoundedRectangleBorder(radius = 5),
                 ),
-                on_click = lambda e: cambio_menu(
-                    ft.Text("Seccion Generacion de QR", color = "white")
-                )
-            ),      
-
-            ft.ElevatedButton(
-                "Reportes",
-                icon = ft.Icons.REPORT,
-                width = 200,
-                height = 54,
-                style = ft.ButtonStyle(
-                    shape = ft.RoundedRectangleBorder(radius = 5),
-                ),
-                on_click = lambda e: cambio_menu(
-                    ft.Text("Seccion Reportes", color = "white")
-                )
-            ),      
+                on_click = lambda e: cambio_menu(vista_generar(page))
+            ),           
 
             ft.Container(expand = True),
             ft.Divider(color = ft.Colors.WHITE24),

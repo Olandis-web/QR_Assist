@@ -15,7 +15,7 @@ def obtener_datos():
 
     return datos
 
-def insertar_empleado(nombres, apellidos, cargo, qr, estado):
+def insertar_empleado(nombres, apellidos, cargo, estado, qr=None):
     """Funcion que inserta informacion a la base de datos mediante el formularion de empleados"""
     
     conectar = conexion.conexion()
@@ -31,7 +31,7 @@ def insertar_empleado(nombres, apellidos, cargo, qr, estado):
 
     
 
-def actualizar_empleado(id_empleado, nombres, apellidos, cargo, qr, estado):
+def actualizar_empleado(id_empleado, nombres, apellidos, cargo, estado, qr=None):
     """Funcion que actualiza informacion a la base de datos mediante el formularion de empleados"""
 
     conectar = conexion.conexion()
@@ -72,5 +72,5 @@ def buscar_empleado(id_empleado):
     empleado = cursor.fetchone()
     conectar.close()
     return empleado
-        
+
   

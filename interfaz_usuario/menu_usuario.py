@@ -85,8 +85,8 @@ def vista_menu(page :ft.Page, id_empleado_login):
                     content = ft.Text("AD", color = "white"),
                     bgcolor = ft.Colors.BLUE_700,
                 ),
-                title = ft.Text("Administrador", color = "white", size = 13),
-                subtitle = ft.Text("admin@QrAssist.com", color = "white54", size = 11)
+                title = ft.Text("Nombre Apellido", color = "white", size = 13),
+                subtitle = ft.Text("empleado@QrAssist.com", color = "white54", size = 11)
             )
 
         ], horizontal_alignment=ft.CrossAxisAlignment.CENTER )
