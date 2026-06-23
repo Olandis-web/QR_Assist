@@ -59,7 +59,7 @@ def vista_menu(page):
                 style = ft.ButtonStyle(
                     shape = ft.RoundedRectangleBorder(radius = 5),
                 ),
-                on_click = lambda e: cambio_menu(vista_reportes())
+                on_click = lambda e: cambio_menu(vista_reportes(page))
            
             ),
 
