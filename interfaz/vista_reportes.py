@@ -134,9 +134,7 @@ def vista_reportes(page):
             controls = [
 
                 ft.Row(
-                    expand = True,
                     spacing = 16,
-
                     controls = [
 
                         # ── COLUMNA IZQUIERDA — CARDS ──────────────────────────
@@ -147,70 +145,70 @@ def vista_reportes(page):
                             controls = [
 
                                 ft.Container(
-                                    width = 140,
+                                    width = 180,
                                     bgcolor = ft.Colors.BLUE_GREY_800,
                                     border_radius = 10,
                                     padding = 15,
                                     content = ft.Column(
                                         spacing = 4,
                                         controls = [
-                                            ft.Text("Empleados activos", color = "white54", size = 12),
+                                            ft.Text("Empleados activos", color = "white54", size = 14, weight = "bold"),
                                             ft.Text(str(activos), color = "white", size = 29, weight = "bold")
                                         ]
                                     )
                                 ),
 
                                 ft.Container(
-                                    width = 140,
+                                    width = 180,
                                     bgcolor = ft.Colors.BLUE_GREY_800,
                                     border_radius = 10,
                                     padding = 15,
                                     content = ft.Column(
                                         spacing = 4,
                                         controls = [
-                                            ft.Text("Presentes hoy", color = "white54", size = 12),
+                                            ft.Text("Presentes hoy", color = "white54", size = 14, weight = "bold"),
                                             ft.Text(str(presentes), color = "green", size = 29, weight = "bold")
                                         ]
                                     )
                                 ),
 
                                 ft.Container(
-                                    width = 140,
+                                    width = 180,
                                     bgcolor = ft.Colors.BLUE_GREY_800,
                                     border_radius = 10,
                                     padding = 15,
                                     content = ft.Column(
                                         spacing = 4,
                                         controls = [
-                                            ft.Text("Tardanzas hoy", color = "white54", size = 12),
+                                            ft.Text("Tardanzas hoy", color = "white54", size = 14, weight = "bold"),
                                             ft.Text(str(tardanzas), color = "orange", size = 29, weight = "bold")
                                         ]
                                     )
                                 ),
 
                                 ft.Container(
-                                    width = 140,
+                                    width = 180,
                                     bgcolor = ft.Colors.BLUE_GREY_800,
                                     border_radius = 10,
                                     padding = 15,
                                     content = ft.Column(
                                         spacing = 4,
                                         controls = [
-                                            ft.Text("Ausentes hoy", color = "white54", size = 12),
+                                            ft.Text("Ausentes hoy", color = "white54", size = 14, weight = "bold"),
                                             ft.Text(str(ausentes), color = "red", size = 29, weight = "bold")
                                         ]
                                     )
                                 ),
 
                                 ft.Container(
-                                    width = 140,
+                                    width = 180,
                                     bgcolor = ft.Colors.BLUE_GREY_800,
                                     border_radius = 10,
                                     padding = 15,
                                     content = ft.Column(
                                         spacing = 4,
                                         controls = [
-                                            ft.Text("Sin QR asignado", color = "white54", size = 12),
+                                            ft.Text("Sin QR asignado", color = "white54", size = 14, weight = "bold"),
                                             ft.Text(str(sin_qr), color = "#ff7043", size = 29, weight = "bold")
                                         ]
                                     )
@@ -220,7 +218,6 @@ def vista_reportes(page):
 
                         # ── COLUMNA DERECHA ────────────────────────────────────
                         ft.Column(
-                            expand = True,
                             spacing = 12,
 
                             controls = [
@@ -235,7 +232,7 @@ def vista_reportes(page):
                                     content = ft.Column(
                                         spacing = 10,
                                         controls = [
-                                            ft.Text("Ranking del mes", color = "white54", size = 12),
+                                            ft.Text("Ranking del mes", color = "white54", size = 14, weight = "bold"),
                                             ft.Row(
                                                 spacing = 8,
                                                 controls = [
@@ -262,7 +259,7 @@ def vista_reportes(page):
                                         spacing = 14,
                                         controls = [
 
-                                            ft.Text("Exportar reportes", color = "white54", size = 12),
+                                            ft.Text("Exportar reportes", color = "white54", size = 14, weight = "bold"),
 
                                             # Empleados
                                             ft.Column(
@@ -272,7 +269,7 @@ def vista_reportes(page):
                                                         spacing = 6,
                                                         controls = [
                                                             ft.Icon(ft.Icons.PEOPLE, color = "white54", size = 15),
-                                                            ft.Text("Empleados", color = "white70", size = 12)
+                                                            ft.Text("Empleados", color = "white70", size = 12, weight = "bold")
                                                         ]
                                                     ),
                                                     ft.Row(
@@ -317,7 +314,7 @@ def vista_reportes(page):
                                                         spacing = 6,
                                                         controls = [
                                                             ft.Icon(ft.Icons.MANAGE_ACCOUNTS, color = "white54", size = 15),
-                                                            ft.Text("Usuarios", color = "white70", size = 12)
+                                                            ft.Text("Usuarios", color = "white70", size = 12, weight = "bold")
                                                         ]
                                                     ),
                                                     ft.Row(
@@ -362,7 +359,7 @@ def vista_reportes(page):
                                                         spacing = 6,
                                                         controls = [
                                                             ft.Icon(ft.Icons.CALENDAR_MONTH, color = "white54", size = 15),
-                                                            ft.Text("Asistencia", color = "white70", size = 12)
+                                                            ft.Text("Asistencia", color = "white70", size = 12, weight = "bold")
                                                         ]
                                                     ),
                                                     ft.Row(
@@ -408,27 +405,61 @@ def vista_reportes(page):
                                                     )
                                                 ]
                                             ),
+                                        ]
+                                    )
+                                ),
+                            ]
+                        ),
+
+                        ft.Column(
+                            expand = True,
+                            spacing = 12,
+                            controls = [
+
+                                ft.Container(
+                                    height = 300,
+                                    width = 600,
+                                    bgcolor = ft.Colors.BLUE_GREY_800,
+                                    border_radius = 10,
+                                    padding = 16,
+
+                                    content = ft.Column(
+                                        controls = [
+                                            ft.Text("Distribucion de hoy", color = "white54", size = 14, weight = "bold"),
 
                                         ]
                                     )
                                 ),
 
-                            ]
-                        ),
+                                ft.Container(
+                                    height = 185, 
+                                    width = 600,
+                                    bgcolor = ft.Colors.BLUE_GREY_800,
+                                    border_radius = 10,
+                                    padding = 16,
 
+                                    content = ft.Column(
+                                        controls = [
+                                            ft.Text("Asistencia semanal", color = "white54", size = 14, weight = "bold"),
+                                            
+                                        ]
+                                    )
+                                )
+                            ]
+                        )
                     ]
                 ),
 
                 # ── TABLA DE ÚLTIMOS REGISTROS — ANCHO COMPLETO ────────────────
                 ft.Container(
+                    height = 230,
                     bgcolor = ft.Colors.BLUE_GREY_800,
                     border_radius = 10,
                     padding = 16,
                     content = ft.Column(
                         controls = [
-                            ft.Text("Últimos registros de asistencia", color = "white54", size = 12),
+                            ft.Text("Últimos registros de asistencia", color = "white54", size = 14, weight = "bold"),
                             ft.Column(
-                                expand = True,
                                 scroll = "auto",
                                 controls = [tabla]
                             )
