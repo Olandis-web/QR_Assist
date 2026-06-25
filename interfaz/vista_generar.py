@@ -50,6 +50,24 @@ def vista_generar(page):
                                     generar_qr(e, empleado)
 
                                 )
+                                if not verifica_qr(empleado[0])
+
+                                else 
+                                ft.Text("Listo", color ="green")
+                            ),
+
+                            ft.DataCell(
+                                ft.IconButton(
+                                    icon = ft.Icons.VISIBILITY,
+                                    tooltip = "Ver QR",
+                                    icon_color = "white",
+
+                                    on_click = lambda e, 
+                                    empleado = empleado:
+
+                                    ver_qr(e, empleado)
+
+                                )
                             )
                             
                         ]
@@ -266,6 +284,7 @@ def vista_generar(page):
 
         content = ft.Column(
             controls = [
+                busqueda,
 
                 ft.Column(
                     expand = True,
@@ -278,7 +297,7 @@ def vista_generar(page):
         )
     )
 
-    return ft.Row(
+    return ft.Column(
             controls = [
                 table
             ],
