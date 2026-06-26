@@ -1,5 +1,7 @@
 import flet as ft
 from interfaz import login
+from database import reportes
+reportes.generar_pie(0, 0, 0)
 
 def main(page: ft.Page):
     '''Se encarga de insertar las caracteristicas principales de la pagina 

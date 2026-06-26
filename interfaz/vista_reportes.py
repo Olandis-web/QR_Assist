@@ -3,7 +3,6 @@ from interfaz.vista_empleados import vista_empleados
 from interfaz.vista_usuarios import vista_usuarios
 from database import reportes
 
-
 def vista_reportes(page):
     '''Muestra el dashboard de reportes con cards de métricas, gráfico semanal,
     botones de exportación y tabla de últimos registros de asistencia.'''
@@ -16,6 +15,8 @@ def vista_reportes(page):
     registros = reportes.ultimos_registros()
     puntuales = reportes.top_puntuales()
     incidencias = reportes.top_incidencias()
+    reportes.generar_pie(presentes, tardanzas, ausentes)
+    reportes.generar_barchart()
 
     lista_ranking = ft.Column(spacing = 6, controls = [])
 
@@ -424,13 +425,50 @@ def vista_reportes(page):
                                     padding = 16,
 
                                     content = ft.Column(
+                                        horizontal_alignment = ft.CrossAxisAlignment.CENTER,
                                         controls = [
                                             ft.Text("Distribucion de hoy", color = "white54", size = 14, weight = "bold"),
+                                            ft.Image(
+                                                src = "pie_asistencia.png",
+                                                width = 400,
+                                                height = 250,
+                                                fit = "contain"
+                                            ),
 
-                                        ]
+                                            ft.Row(
+                                                alignment = ft.MainAxisAlignment.CENTER,
+                                                spacing = 16,
+                                                controls = [
+                                                    ft.Row(
+                                                        spacing = 4,
+                                                        controls = [
+                                                            ft.Container(width = 10, height = 10, bgcolor = "#388e3c", border_radius = 5),
+                                                            ft.Text("A tiempo", color = "white54", size = 11)
+                                                        ]
+                                                    ),
+
+                                                    ft.Row(
+                                                        spacing = 4,
+                                                        controls = [
+                                                            ft.Container(width = 10, height = 10, bgcolor = "#f57c00", border_radius = 5),
+                                                            ft.Text("Tardanza", color = "white54", size = 11)
+                                                        ]
+                                                    ),
+
+                                                    ft.Row(
+                                                        spacing = 4,
+                                                        controls = [
+                                                            ft.Container(width = 10, height = 10, bgcolor = "#c62828", border_radius = 5),
+                                                            ft.Text("Ausente", color = "white54", size = 11)
+                                                        ]
+                                                    ),
+                                                ]
+                                            ),
+                                        ]    
                                     )
                                 ),
 
+                                
                                 ft.Container(
                                     height = 185, 
                                     width = 600,
@@ -441,7 +479,12 @@ def vista_reportes(page):
                                     content = ft.Column(
                                         controls = [
                                             ft.Text("Asistencia semanal", color = "white54", size = 14, weight = "bold"),
-                                            
+                                            ft.Image(
+                                                src = "bar_asistencia.png",
+                                                width = 550,
+                                                height = 140,
+                                                fit = "contain"
+                                            )
                                         ]
                                     )
                                 )
