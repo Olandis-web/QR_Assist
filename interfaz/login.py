@@ -2,6 +2,7 @@ import flet as ft
 from database import usuarios
 from interfaz_usuario import menu_usuario
 import asyncio
+import sesion
 
 
 def login(page: ft.Page):
@@ -17,6 +18,15 @@ def login(page: ft.Page):
         )
 
         if resultado:
+
+            sesion.usuario_actual = {
+                "id_usuario": resultado[0],
+                "id_empleado": resultado[1],
+                "nombre": resultado[2],
+                "apellido": resultado[3],
+                "usuario": resultado[4],
+                "rol": resultado[6]
+            }
 
             id_empleado_login = resultado[1]
             rol = resultado[6]

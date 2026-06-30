@@ -7,7 +7,7 @@ def obtener_datos():
     conectar = conexion.conexion()
     cursor = conectar.cursor()
     
-    cursor.execute("Select Distinct * from Empleados")
+    cursor.execute("Select * from Empleados")
 
     datos = cursor.fetchall()
     
