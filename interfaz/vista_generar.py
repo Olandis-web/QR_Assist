@@ -244,6 +244,10 @@ def vista_generar(page):
 
             actions = [
                 ft.TextButton(
+                    "Imprimir"
+                ),
+
+                ft.TextButton(
                     "Cerrar",
                     on_click = lambda x: cerrar_carnet(e, carnet)
                 )

@@ -167,11 +167,9 @@ def generar_pie(presentes, tardanzas, ausentes):
         ausentes if ausentes > 0 else 0.1
     ]
     colores = ["#388e3c", "#f57c00", "#c62828"]
-    labels = ["A tiempo", "Tardanza", "Ausente"]
 
     ax.pie(
         valores,
-        labels = labels,
         colors = colores,
         autopct = "%1.0f%%",
         textprops = dict(color = "white", fontsize = 10),

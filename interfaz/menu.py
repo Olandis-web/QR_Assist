@@ -4,6 +4,7 @@ from interfaz.vista_usuarios import vista_usuarios
 from interfaz.vista_reportes import vista_reportes
 from interfaz.vista_generar import vista_generar
 import sesion
+import asyncio
 
 def vista_menu(page):
     '''Esta funcion muestra el menu principal, con la division de la barra lateral y la parte del contenido.
@@ -25,9 +26,22 @@ def vista_menu(page):
         '''Esta funcion se encarga de lograr el cambio de pagina 
         hacia los elementos elgidos'''
 
-        area_principal.content = contenido
+        area_principal.content = ft.Container(
+            expand=True,
+            alignment=ft.Alignment.CENTER,
+            content=ft.ProgressRing(),
+        )
         page.update()
 
+        async def cargar():
+            await asyncio.sleep(0.5)
+
+            area_principal.content = contenido
+            page.update()
+
+        page.run_task(cargar)
+
+        
     area_principal = ft.Container(
         expand = True,
         bgcolor = ft.Colors.BLUE_GREY_900,

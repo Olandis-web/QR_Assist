@@ -2,10 +2,13 @@ import flet as ft
 from interfaz.vista_empleados import vista_empleados
 from interfaz.vista_usuarios import vista_usuarios
 from database import reportes
+from database import conexion
 
 def vista_reportes(page):
     '''Muestra el dashboard de reportes con cards de métricas, gráfico semanal,
     botones de exportación y tabla de últimos registros de asistencia.'''
+
+    conectar = conexion.conexion()
 
     activos, total = reportes.total_empleados()
     presentes = reportes.presentes()
@@ -17,6 +20,8 @@ def vista_reportes(page):
     incidencias = reportes.top_incidencias()
     reportes.generar_pie(presentes, tardanzas, ausentes)
     reportes.generar_barchart()
+
+    conectar.close()
 
     lista_ranking = ft.Column(spacing = 6, controls = [])
 
@@ -217,7 +222,7 @@ def vista_reportes(page):
                             ]
                         ),
 
-                        # ── COLUMNA DERECHA ────────────────────────────────────
+                        # ── COLUMNA CENTRAL ────────────────────────────────────
                         ft.Column(
                             spacing = 12,
 
@@ -428,12 +433,6 @@ def vista_reportes(page):
                                         horizontal_alignment = ft.CrossAxisAlignment.CENTER,
                                         controls = [
                                             ft.Text("Distribucion de hoy", color = "white54", size = 14, weight = "bold"),
-                                            ft.Image(
-                                                src = "pie_asistencia.png",
-                                                width = 400,
-                                                height = 250,
-                                                fit = "contain"
-                                            ),
 
                                             ft.Row(
                                                 alignment = ft.MainAxisAlignment.CENTER,
@@ -461,8 +460,15 @@ def vista_reportes(page):
                                                             ft.Container(width = 10, height = 10, bgcolor = "#c62828", border_radius = 5),
                                                             ft.Text("Ausente", color = "white54", size = 11)
                                                         ]
-                                                    ),
+                                                    ),   
                                                 ]
+                                            ),
+
+                                            ft.Image(
+                                                src = "pie_asistencia.png",
+                                                width = 400,
+                                                height = 250,
+                                                fit = "contain"
                                             ),
                                         ]    
                                     )
@@ -477,6 +483,7 @@ def vista_reportes(page):
                                     padding = 16,
 
                                     content = ft.Column(
+                                        horizontal_alignment = ft.CrossAxisAlignment.CENTER,
                                         controls = [
                                             ft.Text("Asistencia semanal", color = "white54", size = 14, weight = "bold"),
                                             ft.Image(
