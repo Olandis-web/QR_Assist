@@ -126,10 +126,21 @@ class CamaraApp(ft.Container):
             for codes in decode(frame):
                 try:
                     
-                    info = codes.data.decode('utf-8')
-                    codigo = int(info)
+                    codigo_qr = codes.data.decode('utf-8')
+                    
+                    from database.empleados import buscar_por_qr
+                    empleado = buscar_por_qr(codigo_qr)
 
-                    if codigo != self.id_empleado_login:
+                    if not empleado:
+                        self.lbl_nombre.value = "QR no reconocido"
+                        self.lbl_nombre.color = ft.Colors.RED
+                        self.lbl_nombre.update()
+                        continue
+
+                    id_empleado = empleado[0]
+                    nombre_completo = f"{empleado[1]} {empleado[2]}"
+
+                    if id_empleado != self.id_empleado_login:
                         self.lbl_nombre.value = "QR no autorizado"
                         self.lbl_nombre.color = ft.Colors.RED
                         self.lbl_nombre.update()
@@ -142,21 +153,10 @@ class CamaraApp(ft.Container):
                     cv2.polylines(frame, [pts], True, (255, 255, 0), 5)
                     
                     # Busca al empleado en la base de datos
-                    empleado = buscar_empleado(codigo)
-                    
-                    # Muestra el nombre del empleado encontrado
-                    if empleado:
-                       nombre_completo = f"{empleado[0]} {empleado[1]}"
-
-                       self.lbl_nombre.value = nombre_completo
-                       self.lbl_nombre.color = ft.Colors.GREEN_ACCENT_400
-                    else:
-                        nombre_completo = f"ID{codigo}"
-                       
-                        self.lbl_nombre.value = "Empleado no encontrado"
-                        self.lbl_nombre.color = ft.Colors.RED
-
+                    self.lbl_nombre.value = nombre_completo
+                    self.lbl_nombre.color = ft.Colors.GREEN_ACCENT_400
                     self.lbl_nombre.update()
+
                  
                     # Registra de asistencia según el horario de Lunes a Viernes
                     if 4 >= diasem >= 0:
@@ -172,17 +172,14 @@ class CamaraApp(ft.Container):
                         else:
                             estado = "Tarde"
 
-                        if codigo not in self.registro_diario:
                         
-                            self.registro_diario.append(codigo)
-                        
-                        self._guardar_sql(codigo, estado)
+                        self._guardar_sql(id_empleado, estado)
 
                         self._guardar_excel(nomar, estado, nombre_completo)
 
                         cv2.putText(
                             frame,
-                            f"{codigo} - {estado}",
+                            f"{nombre_completo} - {estado}",
                             (xi - 15, yi - 15),
                             cv2.FONT_HERSHEY_SIMPLEX,
                             1,
@@ -198,7 +195,7 @@ class CamaraApp(ft.Container):
                 if self.is_running:
                     self.main_page.update()
             except Exception:
-                pass    
+                pass
             
             cv2.imshow("camara", frame)
             if cv2.waitKey(1) == 27 : #cierra con el teclado esc

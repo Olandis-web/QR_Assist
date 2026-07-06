@@ -73,4 +73,22 @@ def buscar_empleado(id_empleado):
     conectar.close()
     return empleado
 
+def buscar_por_qr(qr):
+    """Busca un empleado por su codigo QR en camara"""
+
+    conectar = conexion.conexion()
+    cursor = conectar.cursor()
+
+    cursor.execute(
+        """SELECT ID_Empleado, Nombres, Apellidos
+        FROM Empleados
+        WHERE Codigo_qr = ?""", (qr,)
+    )
+
+    resultado = cursor.fetchone()
+    conectar.close()
+    return resultado
+    
+    
+
   

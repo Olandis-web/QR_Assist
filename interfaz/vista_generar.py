@@ -209,20 +209,15 @@ def vista_generar(page):
         datatable.update()
 
 
-        carnet = ft.AlertDialog(
-            modal = True,
-
-            title = ft.Text(
-                "Carnet de Empleado",
-                weight = "bold"
-            ),
+        carnet = ft.BottomSheet(
 
             content = ft.Container(
                 width = 350,
+                height = 400,
 
                 content = ft.Column(
-                    tight = True,
-
+  
+                    scroll = "auto",
                     controls = [
                         ft.Text(f"{empleado[1]} {empleado[2]}",
                                 size = 20,
@@ -232,26 +227,32 @@ def vista_generar(page):
 
                             ft.Text(f"Codigo: {codigo}"),
 
-                            ft.Image(
-                                src = ruta,
-                                width = 200,
-                                height = 200,
-                                fit = "contain"
-                            )
+                            ft.Container(
+                                width = 10,
+                                height = 10,
+
+                                content = ft.Image(
+                                    src = ruta,
+                                    fit = "fill"
+                                )
+                            ),
+
+                        ft.Row(
+                            alignment = ft.MainAxisAlignment.END,
+                            controls = [
+                                ft.TextButton(
+                                    "Imprimir",
+                                ),
+
+                                ft.TextButton(
+                                    "Cerrar",
+                                    on_click = lambda x: cerrar_carnet(e, carnet)
+                                )
+                            ]
+                        )
                     ]
                 )
             ),
-
-            actions = [
-                ft.TextButton(
-                    "Imprimir"
-                ),
-
-                ft.TextButton(
-                    "Cerrar",
-                    on_click = lambda x: cerrar_carnet(e, carnet)
-                )
-            ]
         )
         page.overlay.append(carnet)
         carnet.open = True
