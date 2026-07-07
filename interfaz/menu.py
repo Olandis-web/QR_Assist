@@ -41,7 +41,9 @@ def vista_menu(page):
 
         page.run_task(cargar)
 
-        
+        return area_principal
+    
+
     area_principal = ft.Container(
         expand = True,
         bgcolor = ft.Colors.BLUE_GREY_900,
@@ -86,7 +88,7 @@ def vista_menu(page):
                 style = ft.ButtonStyle(
                     shape = ft.RoundedRectangleBorder(radius = 5),
                 ),
-                on_click = lambda e: cambio_menu(vista_reportes(page))
+                on_click = lambda e: cambio_menu(vista_reportes(page, cambio_menu))
            
             ),
 

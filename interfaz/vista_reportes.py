@@ -1,12 +1,18 @@
 import flet as ft
+import time
 from interfaz.vista_empleados import vista_empleados
 from interfaz.vista_usuarios import vista_usuarios
 from database import reportes
 from database import conexion
 
-def vista_reportes(page):
+def vista_reportes(page, cambio_menu):
     '''Muestra el dashboard de reportes con cards de métricas, gráfico semanal,
     botones de exportación y tabla de últimos registros de asistencia.'''
+
+    def actualizar_dashboard(e):
+        """Permite actualizar los datos de la vista de reportes"""
+
+
 
     conectar = conexion.conexion()
 
@@ -130,7 +136,7 @@ def vista_reportes(page):
     contenido = ft.Container(
         expand = True,
         bgcolor = ft.Colors.BLUE_GREY_900,
-        padding = 16,
+        padding = 5,
 
         content = ft.Column(
             expand = True,
@@ -138,6 +144,26 @@ def vista_reportes(page):
             horizontal_alignment = ft.CrossAxisAlignment.STRETCH,
 
             controls = [
+
+                ft.Row(
+                    height = 30,
+                    alignment = ft.MainAxisAlignment.SPACE_BETWEEN,
+                    vertical_alignment = ft.CrossAxisAlignment.CENTER,
+                    controls = [
+                        ft.Text("Dashboard",
+                                size = 20,
+                                weight = "bold",
+                                color = "white"
+                        ),
+
+                        ft.IconButton(
+                            icon = ft.Icons.REFRESH,
+                            icon_color = "white",
+                            tooltip = "Actualizar info",
+                            on_click = lambda e: cambio_menu(vista_reportes(page, cambio_menu))
+                        )
+                    ]
+                ),
 
                 ft.Row(
                     spacing = 16,
@@ -465,11 +491,11 @@ def vista_reportes(page):
                                             ),
 
                                             ft.Image(
-                                                src = "pie_asistencia.png",
+                                                src = f"pie_asistencia.png",
                                                 width = 400,
                                                 height = 250,
                                                 fit = "contain"
-                                            ),
+                                            )
                                         ]    
                                     )
                                 ),
@@ -487,7 +513,7 @@ def vista_reportes(page):
                                         controls = [
                                             ft.Text("Asistencia semanal", color = "white54", size = 14, weight = "bold"),
                                             ft.Image(
-                                                src = "bar_asistencia.png",
+                                                src = f"bar_asistencia.png",
                                                 width = 550,
                                                 height = 140,
                                                 fit = "contain"
@@ -509,10 +535,15 @@ def vista_reportes(page):
                     content = ft.Column(
                         controls = [
                             ft.Text("Últimos registros de asistencia", color = "white54", size = 14, weight = "bold"),
-                            ft.Column(
-                                scroll = "auto",
-                                controls = [tabla]
+
+                            ft.Container(
+                                expand = True,
+                                content = ft.Column(
+                                    scroll = "auto",
+                                    controls = [tabla]
+                                )
                             )
+                            
                         ]
                     )
                 ),
