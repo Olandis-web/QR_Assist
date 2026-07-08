@@ -196,13 +196,6 @@ class CamaraApp(ft.Container):
                         else:
                             estado = "Tardanza"
 
-                    
-                        self.lbl_estado.value = f"{estado}"
-                        self.lbl_estado.color = ft.Colors.GREEN if estado == "A Tiempo" else ft.Colors.ORANGE
-                        self.lbl_estado.update()
-                        self.main_page.update()
-
-                        print("Estado que se guardará:", estado)
                         
                         self._guardar_sql(id_empleado, estado)
                         self._guardar_excel(nomar, estado, nombre_completo)

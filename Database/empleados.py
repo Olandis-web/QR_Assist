@@ -1,4 +1,9 @@
 import pyodbc
+import qrcode
+import tempfile
+import os
+import time
+from PIL import Image, ImageDraw, ImageFont
 from database import conexion
 
 def obtener_datos():
@@ -88,7 +93,62 @@ def buscar_por_qr(qr):
     resultado = cursor.fetchone()
     conectar.close()
     return resultado
+
+def temporal_qr(codigo, empleado):
+    """Genera un QR temporal, lo imprime y elimina el archivo"""
+
+    qr = qrcode.make(codigo).resize((180, 180))
     
+    carnet = Image.new("RGB", (700, 380), "white")
+    draw = ImageDraw.Draw(carnet)
+
+    azul = (30, 60, 120)
+
+    draw.rectangle((0, 0, 700, 70), fill = azul)
+    titulo = ImageFont.load_default()
+    fuente = ImageFont.load_default()
+
+    draw.text(
+        (20, 25),
+        "QR ASSIST",
+        fill = "white",
+        font = titulo
+    )
+
+    carnet.paste(qr, (30, 110))
+
+    draw.text(
+        (250, 120),
+        f"Nombre: {empleado[1]} {empleado[2]}",
+        fill = "black",
+        font = fuente
+    )
+
+    draw.text(
+        (250, 170),
+        f"Cargo: {empleado[3]}",
+        fill = "black",
+        font = fuente
+    )
+
+    draw.text(
+        (250, 220),
+        f"ID: {empleado[0]}",
+        fill = "black",
+        font = fuente
+    )
+
+    archivo = os.path.join(
+        tempfile.gettempdir(),
+        f"carnet_{empleado[0]}.png"
+    )
+
+    carnet.save(archivo)
+    os.startfile(archivo, "print")
+    time.sleep(5)
+
+    if os.path.exists(archivo):
+        os.remove(archivo)
     
 
   

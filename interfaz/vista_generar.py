@@ -6,6 +6,7 @@ from database import conexion
 from database import empleados
 
 def crear_codigo():
+    """Crea un codigo QR aleatorio"""
 
     return ''.join(
         random.choices(
@@ -13,6 +14,7 @@ def crear_codigo():
             k=16
         )
     )
+
 
 def vista_generar(page):
     '''Muestra el contenido de el formulario de empleados.'''
@@ -58,18 +60,17 @@ def vista_generar(page):
 
                             ft.DataCell(
                                 ft.IconButton(
-                                    icon = ft.Icons.VISIBILITY,
-                                    tooltip = "Ver QR",
+                                    icon = ft.Icons.PRINT,
+                                    tooltip = "Imprimir QR",
                                     icon_color = "white",
 
                                     on_click = lambda e, 
                                     empleado = empleado:
 
-                                    ver_qr(e, empleado)
+                                    imprimir_qr(e, empleado)
 
                                 )
-                            )
-                            
+                            )  
                         ]
                     )
                 )
@@ -85,33 +86,18 @@ def vista_generar(page):
 
     id_empleado = None
 
-    def ver_qr(e, empleado):
-        """Funcion que sirve para ver el QR de los empleados (boton)"""
+    def imprimir_qr(e, empleado):
+        """Funcion que sirve para el QR temporal y lo envia a imprimir"""
 
-        ruta = f"qr/qr_{empleado[0]}.png"
+        from database.empleados import temporal_qr
 
-        carnet = ft.AlertDialog(
-            title = ft.Text("QR del empleado"),
+        codigo = empleado[4]
 
-            content = ft.Column(
-                tight = True,
-                controls = [
-                    ft.Text(
-                        f"{empleado[1]}_{empleado[2]}"
-                    ),
+        if not codigo:
+            return
 
-                    ft.Image(
-                        src = ruta,
-                        width = 200,
-                        height = 200
-                    )
-                ]
-            )
-        )
-        
-        page.overlay.append(carnet)
-        carnet.open = True
-        page.update()
+        temporal_qr(codigo, empleado)
+
 
     def verifica_qr(id_empleado):
         """Funcion para verificar si el empleado ya tiene un QR"""
@@ -166,11 +152,11 @@ def vista_generar(page):
 
                             ft.DataCell(
                                 ft.IconButton(
-                                    icon = ft.Icons.VISIBILITY,
-                                    tooltip = "Ver QR",
-                                    on_click = lambda e, empleado = empleado: ver_qr(e, empleado)
+                                    icon = ft.Icons.PRINT,
+                                    tooltip = "Imprimir QR",
+                                    on_click = lambda e, empleado = empleado: imprimir_qr(e, empleado)
                                 )
-                            )
+                            ),
                         ]
                     ) 
                 )
@@ -187,13 +173,6 @@ def vista_generar(page):
         conec.close()
 
 
-    def cerrar_carnet(e, carnet):
-        """Sirve para cerrar la ventana del carnet"""
-        
-        carnet.open = False
-        page.update()
-
-
     def generar_qr (e, empleado):
         """Funcion que genera un QR aleatorio para los empleados y muestra su carnet"""
 
@@ -201,62 +180,9 @@ def vista_generar(page):
             return 
 
         codigo = crear_codigo()
-        qr = qrcode.make(codigo)
-        ruta = f"qr/qr_{empleado[0]}.png"
-        qr.save(ruta)
         guardar_qr(empleado[0], codigo)
         actualiza_tabla()
         datatable.update()
-
-
-        carnet = ft.BottomSheet(
-
-            content = ft.Container(
-                width = 350,
-                height = 400,
-
-                content = ft.Column(
-  
-                    scroll = "auto",
-                    controls = [
-                        ft.Text(f"{empleado[1]} {empleado[2]}",
-                                size = 20,
-                                weight = "bold"),
-
-                            ft.Text(f"Cargo: {empleado[3]}"),
-
-                            ft.Text(f"Codigo: {codigo}"),
-
-                            ft.Container(
-                                width = 10,
-                                height = 10,
-
-                                content = ft.Image(
-                                    src = ruta,
-                                    fit = "fill"
-                                )
-                            ),
-
-                        ft.Row(
-                            alignment = ft.MainAxisAlignment.END,
-                            controls = [
-                                ft.TextButton(
-                                    "Imprimir",
-                                ),
-
-                                ft.TextButton(
-                                    "Cerrar",
-                                    on_click = lambda x: cerrar_carnet(e, carnet)
-                                )
-                            ]
-                        )
-                    ]
-                )
-            ),
-        )
-        page.overlay.append(carnet)
-        carnet.open = True
-        page.update()
         
         
     datatable = ft.DataTable(
@@ -275,7 +201,7 @@ def vista_generar(page):
                             ft.DataColumn(ft.Text("Cargo", color = "white", weight = "bold")),
                             ft.DataColumn(ft.Text("Estado", color = "white", weight = "bold")),
                             ft.DataColumn(ft.Text("Generar QR", color = "white", weight = "bold")),
-                            ft.DataColumn(ft.Text("Ver QR", color = "white", weight = "bold"))
+                            ft.DataColumn(ft.Text("Imprimir QR", color = "white", weight = "bold"))
                           ],
 
                         rows = []
