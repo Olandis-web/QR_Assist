@@ -49,6 +49,8 @@ def vista_menu(page):
         bgcolor = ft.Colors.BLUE_GREY_900,
         padding = 10,
     )
+    # Mostrar la vista de Reportes por defecto al iniciar
+    area_principal.content = vista_reportes(page, cambio_menu)
 
 
     barra = ft.Container(

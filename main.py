@@ -1,7 +1,6 @@
 import flet as ft
 from interfaz import login
 from database import reportes
-reportes.generar_pie(0, 0, 0)
 
 def main(page: ft.Page):
     '''Se encarga de insertar las caracteristicas principales de la pagina 
@@ -11,8 +10,9 @@ def main(page: ft.Page):
     page.bgcolor = ft.Colors.BLUE_GREY_900
     page.window.maximized = True
 
+    # La gráfica inicial no requiere consultar SQL Server.
+    reportes.generar_pie(0, 0, 0)
+
     page.add(login.login(page))
 
 ft.run(main)
-
-

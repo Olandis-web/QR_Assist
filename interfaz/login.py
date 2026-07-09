@@ -1,5 +1,6 @@
 import flet as ft
 from database import usuarios
+from Database.conexion import DatabaseConnectionError
 from interfaz_usuario import menu_usuario
 import asyncio
 import sesion
@@ -12,10 +13,20 @@ def login(page: ft.Page):
     async def iniciar_sesion(e):
         """Funcion que permite validar los usuarios para iniciar sesion"""
 
-        resultado = usuarios.validar(
-            user.value,
-            contrasena.value
-        )
+        try:
+            resultado = usuarios.validar(
+                user.value,
+                contrasena.value
+            )
+        except DatabaseConnectionError as error:
+            snack = ft.SnackBar(
+                content=ft.Text(str(error), color="white"),
+                bgcolor="red",
+            )
+            page.overlay.append(snack)
+            snack.open = True
+            page.update()
+            return
 
         if resultado:
 

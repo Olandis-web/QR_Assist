@@ -1,13 +1,65 @@
 import flet as ft
 import time
+import shutil
+from pathlib import Path
 from interfaz.vista_empleados import vista_empleados
 from interfaz.vista_usuarios import vista_usuarios
 from database import reportes
 from database import conexion
+from pdfcreate import (
+    generar_reporte_empleados,
+    generar_reporte_usuarios,
+    generar_reporte_asistencia_semanal,
+    generar_reporte_asistencia_mensual,
+)
 
 def vista_reportes(page, cambio_menu):
     '''Muestra el dashboard de reportes con cards de métricas, gráfico semanal,
     botones de exportación y tabla de últimos registros de asistencia.'''
+
+    # ── FilePicker para guardar PDFs ──────────────────────────────────────
+    picker = ft.FilePicker()
+    page.overlay.append(picker)
+    page.update()
+
+    def exportar_pdf(generador, nombre_sugerido):
+        """Genera el PDF y abre el diálogo para guardarlo donde el usuario elija."""
+        async def _ejecutar():
+            try:
+                # 1. Generar el PDF en la carpeta temporal de la app
+                ruta_origen = generador()
+
+                # 2. El usuario elige dónde guardarlo
+                ruta_destino = await picker.save_file(
+                    file_name=nombre_sugerido,
+                    file_type=ft.FilePickerFileType.CUSTOM,
+                    allowed_extensions=["pdf"],
+                )
+                if ruta_destino and Path(ruta_origen).exists():
+                    # 3. Copiar el PDF al lugar elegido por el usuario
+                    shutil.copy2(ruta_origen, ruta_destino)
+                    page.overlay.append(
+                        ft.SnackBar(
+                            content=ft.Text(
+                                f"PDF guardado en: {ruta_destino}", color="white"
+                            ),
+                            bgcolor=ft.Colors.GREEN_700,
+                            open=True,
+                        )
+                    )
+            except Exception as error:
+                page.overlay.append(
+                    ft.SnackBar(
+                        content=ft.Text(
+                            f"No se pudo generar el reporte: {error}", color="white"
+                        ),
+                        bgcolor=ft.Colors.RED_700,
+                        open=True,
+                    )
+                )
+            page.update()
+
+        page.run_task(_ejecutar)
 
     def actualizar_dashboard(e):
         """Permite actualizar los datos de la vista de reportes"""
@@ -316,7 +368,10 @@ def vista_reportes(page, cambio_menu):
                                                                     ]
                                                                 ),
                                                                 bgcolor = "#b71c1c",
-                                                                on_click = None,
+                                                                on_click = lambda e: exportar_pdf(
+                                                                    generar_reporte_empleados,
+                                                                    "reporte_empleados.pdf",
+                                                                ),
                                                                 style = ft.ButtonStyle(shape = ft.RoundedRectangleBorder(radius = 8))
                                                             ),
                                                             ft.ElevatedButton(
@@ -361,7 +416,10 @@ def vista_reportes(page, cambio_menu):
                                                                     ]
                                                                 ),
                                                                 bgcolor = "#b71c1c",
-                                                                on_click = None,
+                                                                on_click = lambda e: exportar_pdf(
+                                                                    generar_reporte_usuarios,
+                                                                    "reporte_usuarios.pdf",
+                                                                ),
                                                                 style = ft.ButtonStyle(shape = ft.RoundedRectangleBorder(radius = 8))
                                                             ),
                                                             ft.ElevatedButton(
@@ -383,7 +441,7 @@ def vista_reportes(page, cambio_menu):
 
                                             ft.Divider(color = "white12", height = 1),
 
-                                            # Asistencia (pendiente — botones desactivados)
+                                            # Asistencia
                                             ft.Column(
                                                 spacing = 8,
                                                 controls = [
@@ -402,24 +460,30 @@ def vista_reportes(page, cambio_menu):
                                                                 content = ft.Row(
                                                                     spacing = 6,
                                                                     controls = [
-                                                                        ft.Icon(ft.Icons.PICTURE_AS_PDF, color = "#546e7a", size = 16),
-                                                                        ft.Text("Semanal", color = "#546e7a", size = 12)
+                                                                        ft.Icon(ft.Icons.PICTURE_AS_PDF, color = "#ffcdd2", size = 16),
+                                                                        ft.Text("Semanal", color = "#ffcdd2", size = 12)
                                                                     ]
                                                                 ),
-                                                                bgcolor = "#37474f",
-                                                                disabled = True,
+                                                                bgcolor = "#b71c1c",
+                                                                on_click = lambda e: exportar_pdf(
+                                                                    generar_reporte_asistencia_semanal,
+                                                                    "reporte_asistencia_semanal.pdf",
+                                                                ),
                                                                 style = ft.ButtonStyle(shape = ft.RoundedRectangleBorder(radius = 8))
                                                             ),
                                                             ft.ElevatedButton(
                                                                 content = ft.Row(
                                                                     spacing = 6,
                                                                     controls = [
-                                                                        ft.Icon(ft.Icons.PICTURE_AS_PDF, color = "#546e7a", size = 16),
-                                                                        ft.Text("Mensual", color = "#546e7a", size = 12)
+                                                                        ft.Icon(ft.Icons.PICTURE_AS_PDF, color = "#ffcdd2", size = 16),
+                                                                        ft.Text("Mensual", color = "#ffcdd2", size = 12)
                                                                     ]
                                                                 ),
-                                                                bgcolor = "#37474f",
-                                                                disabled = True,
+                                                                bgcolor = "#b71c1c",
+                                                                on_click = lambda e: exportar_pdf(
+                                                                    generar_reporte_asistencia_mensual,
+                                                                    "reporte_asistencia_mensual.pdf",
+                                                                ),
                                                                 style = ft.ButtonStyle(shape = ft.RoundedRectangleBorder(radius = 8))
                                                             )
                                                         ]
@@ -545,4 +609,3 @@ def vista_reportes(page, cambio_menu):
         controls = [contenido],
         expand = True
     )
-

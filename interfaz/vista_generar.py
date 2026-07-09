@@ -105,7 +105,7 @@ def vista_generar(page):
     def imprimir_qr(e, empleado):
         """Funcion que sirve para el QR temporal y lo envia a imprimir"""
 
-        from database.empleados import temporal_qr
+        from Database.empleados import temporal_qr
 
         codigo = empleado[4]
 
