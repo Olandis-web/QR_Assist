@@ -226,13 +226,16 @@ def vista_usuarios(page, id_empleado = None, nombres = "", apellidos = ""):
 
 
         dialog.actions = [
-            ft.TextButton(
+            ft.ElevatedButton(
                 "Cancelar",
+                color = "white",
                 on_click = cancelar
             ),
 
-            ft.TextButton(
+            ft.ElevatedButton(
                 "Confirmar",
+                color = "white",
+                bgcolor = "red",
                 on_click = actualizar
             )
         ]   
@@ -276,13 +279,16 @@ def vista_usuarios(page, id_empleado = None, nombres = "", apellidos = ""):
             e.page.update()
 
         dialog.actions = [
-            ft.TextButton(
+            ft.ElevatedButton(
                 "Cancelar",
+                color = "white",
                 on_click = cancelar
             ),
 
-            ft.TextButton(
+            ft.ElevatedButton(
                 "Confirmar",
+                color = "white",
+                bgcolor = "red",
                 on_click = eliminar
             )
         ]

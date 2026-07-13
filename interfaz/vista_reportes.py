@@ -397,18 +397,7 @@ def vista_reportes(page, cambio_menu):
                                                     ft.Row(
                                                         spacing = 8,
                                                         controls = [
-                                                            ft.ElevatedButton(
-                                                                content = ft.Row(
-                                                                    spacing = 6,
-                                                                    controls = [
-                                                                        ft.Icon(ft.Icons.PICTURE_AS_PDF, color = "#546e7a", size = 16),
-                                                                        ft.Text("Diario", color = "#546e7a", size = 12)
-                                                                    ]
-                                                                ),
-                                                                bgcolor = "#37474f",
-                                                                disabled = True,
-                                                                style = ft.ButtonStyle(shape = ft.RoundedRectangleBorder(radius = 8))
-                                                            ),
+                                                            
                                                             ft.ElevatedButton(
                                                                 content = ft.Row(
                                                                     spacing = 6,

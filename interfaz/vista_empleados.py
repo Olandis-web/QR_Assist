@@ -209,6 +209,7 @@ def vista_empleados():
         
         dialog = ft.AlertDialog(
             modal = True,
+
             title = ft.Text("Confirmacion"),
             content = ft.Text("Esta seguro de actualizar este empleado?")
         )
@@ -240,13 +241,16 @@ def vista_empleados():
 
 
         dialog.actions = [
-            ft.TextButton(
+            ft.ElevatedButton(
                 "Cancelar",
+                color = "white",
                 on_click = cancelar
             ),
 
-            ft.TextButton(
+            ft.ElevatedButton(
                 "Confirmar",
+                bgcolor = "red",
+                color = "white",
                 on_click = actualizar
             )
         ]   
@@ -291,13 +295,16 @@ def vista_empleados():
             e.page.update()
 
         dialog.actions = [
-            ft.TextButton(
+            ft.ElevatedButton(
                 "Cancelar",
+                color = "white",
                 on_click = cancelar
             ),
 
-            ft.TextButton(
+            ft.ElevatedButton(
                 "Confirmar",
+                color = "white",
+                bgcolor = "red",
                 on_click = eliminar
             )
         ]
