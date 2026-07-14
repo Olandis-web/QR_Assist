@@ -1,5 +1,6 @@
 import flet as ft
 import time
+from interfaz import menu
 from interfaz.vista_empleados import vista_empleados
 from interfaz.vista_usuarios import vista_usuarios
 from database import reportes
@@ -141,13 +142,11 @@ def vista_reportes(page, cambio_menu):
         content = ft.Column(
             expand = True,
             spacing = 12,
-            horizontal_alignment = ft.CrossAxisAlignment.STRETCH,
 
             controls = [
 
                 ft.Row(
                     height = 30,
-                    alignment = ft.MainAxisAlignment.SPACE_BETWEEN,
                     vertical_alignment = ft.CrossAxisAlignment.CENTER,
                     controls = [
                         ft.Text("Dashboard",
@@ -161,6 +160,18 @@ def vista_reportes(page, cambio_menu):
                             icon_color = "white",
                             tooltip = "Actualizar info",
                             on_click = lambda e: cambio_menu(vista_reportes(page, cambio_menu))
+                        ),
+
+                        ft.Container(expand = True),
+
+                        ft.TextButton("Volver",
+                            icon = ft.Icons.ARROW_BACK,
+                            style = ft.ButtonStyle(
+                            color = "white",
+                            bgcolor = ft.Colors.BLUE_GREY_500,
+                            
+                        ),
+                        on_click = lambda e: volver_menu(e.page)
                         )
                     ]
                 ),
@@ -397,7 +408,6 @@ def vista_reportes(page, cambio_menu):
                                                     ft.Row(
                                                         spacing = 8,
                                                         controls = [
-                                                            
                                                             ft.ElevatedButton(
                                                                 content = ft.Row(
                                                                     spacing = 6,
@@ -545,4 +555,14 @@ def vista_reportes(page, cambio_menu):
         controls = [contenido],
         expand = True
     )
+
+def volver_menu(page):
+    """Esta funcion se encarga de volver al menu principal luego de realizar cualquier
+    accion dentro de esta vista"""
+
+    from interfaz.menu import vista_menu
+    
+    page.clean()
+    page.add(vista_menu(page))
+    page.update()
 

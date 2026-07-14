@@ -32,13 +32,115 @@ def vista_menu(page :ft.Page, id_empleado_login):
         page.update()
     
     
+    def vista_bienvenida(page):
+        """Pantalla de bienvenida del menu principal"""
+
+        from datetime import datetime
+
+        dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
+        meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+                    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
+
+        ahora = datetime.now()
+        fecha = f"{dias[ahora.weekday()]}, {ahora.day} de {meses[ahora.month - 1]} {ahora.year}"
+        hora = ahora.strftime("%I:%M %p")
+
+        nombre = sesion.usuario_actual["nombre"]
+
+        return ft.Container(
+            expand = True,
+            bgcolor = ft.Colors.BLUE_GREY_900,
+            content = ft.Column(
+                expand = True,
+                alignment = ft.MainAxisAlignment.CENTER,
+                horizontal_alignment = ft.CrossAxisAlignment.CENTER,
+                spacing = 20,
+                controls = [
+
+                    ft.Icon(ft.Icons.QR_CODE, color = "white", size = 80),
+
+                    ft.Text(
+                        f"Bienvenido, {nombre}",
+                        color = "white",
+                        size = 30,
+                        weight = "bold"
+                    ),
+
+                    ft.Container(height = 50),
+
+                    ft.Text(
+                    "Seleccione una opcion dentro del menu lateral para acceder a las diferentes funciones",
+                    color = "white",
+                    size = 18,
+                    ),
+
+                    ft.Container(height = 50),
+
+
+                    ft.Row(
+                        alignment = ft.MainAxisAlignment.CENTER,
+                        controls = [
+                            ft.Icon(ft.Icons.CALENDAR_MONTH, color = "white"),
+                            ft.Text(
+                                "Hoy es:",
+                                color = "white",
+                                weight = "bold",
+                                size = 18
+                            ),
+                        ]
+                    ),
+
+                    ft.Text(
+                        fecha,
+                        color = "white",
+                        size = 20
+                    ),
+
+                    ft.Container(height = 10),
+
+                    ft.Row(
+                        alignment = ft.MainAxisAlignment.CENTER,
+                        controls = [
+                            ft.Icon(ft.Icons.ACCESS_TIME, color = "white"),
+                            ft.Text(
+                                "Hora Actual:",
+                                color = "white",
+                                weight = "bold",
+                                size = 18
+                            ),
+                        ]
+                    ),
+
+                    ft.Text(
+                        hora,
+                        color = "white",
+                        size = 20
+                    ),
+
+                    ft.Container(height = 120),
+
+                    ft.Row(
+                        alignment = ft.MainAxisAlignment.CENTER,
+                        spacing = 20,
+                        controls = [
+                            ft.Text(
+                                "QR Assist - Version 1.0",
+                                color = "white",
+                                size = 14
+                            )
+                        ]
+                    )
+                ]
+            )
+        )
+
     # Contenedor donde se cargan las vistas del sistema   
     area_principal = ft.Container(
         expand = True,
         bgcolor = ft.Colors.BLUE_GREY_900,
         padding = 20,
         alignment = ft.alignment.Alignment(0,0),
-        content=ft.Container()
+        content=vista_bienvenida(page)
 
     )
     
@@ -60,20 +162,7 @@ def vista_menu(page :ft.Page, id_empleado_login):
             ),
 
             ft.Divider(color = ft.Colors.WHITE24),
-            
-            # Mensaje de bienvenida
-            ft.Container(
-                padding=ft.padding.only(top=10, bottom=10),
-                content=ft.Text(
-                    "Bienvenido/a al sistema", 
-                    color="white", 
-                    size=13,
-                    weight = "bold",
-                    text_align=ft.TextAlign.CENTER
-                    
-                    
-                    )
-                ),
+
             
             ft.Container(expand=True),
            
