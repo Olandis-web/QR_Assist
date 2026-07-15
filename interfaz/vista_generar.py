@@ -77,7 +77,6 @@ def vista_generar(page):
                                 ft.IconButton(
                                     icon = ft.Icons.DELETE,
                                     tooltip = "Eliminar QR",
-                                    icon_color = "red",
 
                                     on_click = lambda e, 
                                     empleado = empleado:
@@ -231,7 +230,7 @@ def vista_generar(page):
                                     confirmacion_qr(e, empleado)
                                 )
                                 if empleado[4]
-                                else ft.Text("-")
+                                else ft.Text(" -")
                             )
                         ]
                     )

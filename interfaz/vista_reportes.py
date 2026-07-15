@@ -551,6 +551,33 @@ def vista_reportes(page, cambio_menu):
         )
     )
 
+    #Muestra los empleados inactivos o en licencia en una notificacion
+
+    licencia, inactivo = reportes.no_activos()
+
+    licencia = licencia or 0
+    inactivo = inactivo or 0
+
+    if licencia > 0  or inactivo > 0:
+        mensaje = []
+
+        if licencia > 0:
+            mensaje.append(f"{licencia} en licencia")
+
+        if inactivo> 0:
+            mensaje.append(f"{inactivo} inactivos")
+        
+            snack = ft.SnackBar(
+                content = ft.Text(
+                    "Aviso: Hay " + " y ".join(mensaje) + ". No seran considarados en los reportes."
+                ),
+                bgcolor = ft.Colors.ORANGE_700
+            )
+
+            page.overlay.append(snack)
+            snack.open = True
+            page.update()
+
     return ft.Row(
         controls = [contenido],
         expand = True

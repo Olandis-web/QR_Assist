@@ -27,9 +27,11 @@ def presentes():
     cursor = conectar.cursor()
 
     cursor.execute("""
-        SELECT COUNT(*) FROM Asistencia
-        WHERE Fecha = CAST(GETDATE() AS DATE)
-        AND Estado IN ('A tiempo', 'Tardanza')
+        SELECT COUNT(*) FROM Asistencia a
+        JOIN Empleados e ON a.ID_Empleado = e.ID_Empleado
+        WHERE a.Fecha = CAST(GETDATE() AS DATE)
+        AND a.Estado IN ('A tiempo', 'Tardanza')
+        AND e.Estado = 'Activo'
     """)
 
     total = cursor.fetchone()[0]
@@ -44,9 +46,11 @@ def tardanzas():
     cursor = conectar.cursor()
 
     cursor.execute("""
-        SELECT COUNT(*) FROM Asistencia
-        WHERE Fecha = CAST(GETDATE() AS DATE)
-        AND Estado = 'Tardanza'
+        SELECT COUNT(*) FROM Asistencia a
+        JOIN Empleados e ON a.ID_Empleado = e.ID_Empleado
+        WHERE a.Fecha = CAST(GETDATE() AS DATE)
+        AND a.Estado = 'Tardanza'
+        AND e.Estado = 'Activo'
     """)
 
     total = cursor.fetchone()[0]
@@ -124,6 +128,7 @@ def top_puntuales():
         FROM Asistencia a
         JOIN Empleados e ON a.ID_Empleado = e.ID_Empleado
         WHERE a.Estado = 'A tiempo'
+        AND e.Estado = 'Activo'
         AND MONTH(a.Fecha) = MONTH(GETDATE())
         AND YEAR(a.Fecha) = YEAR(GETDATE())
         GROUP BY e.Nombres, e.Apellidos
@@ -145,6 +150,7 @@ def top_incidencias():
         FROM Asistencia a
         JOIN Empleados e ON a.ID_Empleado = e.ID_Empleado
         WHERE a.Estado IN ('Tardanza', 'Ausente')
+        AND e.Estado = 'Activo'
         AND MONTH(a.Fecha) = MONTH(GETDATE())
         AND YEAR(a.Fecha) = YEAR(GETDATE())
         GROUP BY e.Nombres, e.Apellidos
@@ -188,11 +194,13 @@ def asistencia_semanal():
     cursor = conectar.cursor()
 
     cursor.execute("""
-        SELECT Fecha, Estado, COUNT(*) AS Total
-        FROM Asistencia
-        WHERE Fecha >= DATEADD(DAY, -6, CAST(GETDATE() AS DATE))
-        GROUP BY Fecha, Estado
-        ORDER BY Fecha
+        SELECT a.Fecha, a.Estado, COUNT(*) AS Total
+        FROM Asistencia a
+        JOIN Empleados e ON a.ID_Empleado = e.ID_Empleado
+        WHERE a.Fecha >= DATEADD(DAY, -6, CAST(GETDATE() AS DATE))
+        AND e.Estado = 'Activo'
+        GROUP BY a.Fecha, a.Estado
+        ORDER BY a.Fecha
 """)
     
     datos = cursor.fetchall()
@@ -252,3 +260,22 @@ def generar_barchart():
 
     plt.savefig("bar_asistencia.png", bbox_inches = "tight", facecolor = "#37474f")
     plt.close()
+
+def no_activos():
+    """Muestra la cantidad de empleados que estan inactivos o en licencia para no ser contados en la 
+    vista de reportes"""
+
+    conectar = conexion.conexion()
+    cursor = conectar.cursor()
+
+    cursor.execute(
+        """SELECT 
+                SUM(CASE WHEN Estado = 'Licencia' THEN 1 ELSE 0 END) AS Licencia,
+                SUM(CASE WHEN Estado = 'Inactivo' THEN 1 ELSE 0 END) AS Inactivo
+            FROM Empleados
+            """)
+    
+    resultado = cursor.fetchone()
+    conectar.close()
+
+    return resultado
