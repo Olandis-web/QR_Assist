@@ -90,6 +90,19 @@ def vista_empleados():
         on_submit = buscar
     )
 
+    filtro = ft.Dropdown(
+        label = "Filtrar estado",
+        width = 180,
+        value = "Todos",
+        options = [
+            ft.dropdown.Option("Todos"),
+            ft.dropdown.Option("Activo"),
+            ft.dropdown.Option("Inactivo"),
+            ft.dropdown.Option("Licencia")
+        ],
+        on_select = lambda e: actualiza_tabla()
+    )
+
     id_empleado = None
     def seleccionar(empleado):
         """Funcion que permite seleccionar los datos de las tablas y que 
@@ -111,8 +124,12 @@ def vista_empleados():
     def actualiza_tabla():
         """Funcion que actualiza la tabla luego de insertar , actualizar o eliminar un empleado"""
 
+        filtro_estado = filtro.value
         datatable.rows.clear()
         for empleado in empleados.obtener_datos():
+                
+                if filtro_estado != "Todos" and empleado[5] != filtro_estado:
+                    continue
                 
                 usuario_existente = usuarios.verifica_usuario(
                     empleado[0]
@@ -443,8 +460,8 @@ def vista_empleados():
                                 on_click = eliminacion_empleado,
                                 icon = ft.Icons.DELETE,
                                 icon_color = "white"         
-                            )
-
+                            ),
+                            filtro
                         ]
                     )
                 ),

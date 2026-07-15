@@ -71,6 +71,19 @@ def vista_usuarios(page, id_empleado = None, nombres = "", apellidos = ""):
         on_submit = buscar
     )
 
+    filtro = ft.Dropdown(
+        label = "Filtrar Rol",
+        width = 180,
+        value = "Todos",
+        options = [
+            ft.dropdown.Option("Todos"),
+            ft.dropdown.Option("Empleado"),
+            ft.dropdown.Option("Administrador"),
+        ],
+        on_select = lambda e: actualiza_tabla()
+    )
+
+
     id_usuario = None
     empleado_id = id_empleado
 
@@ -114,8 +127,13 @@ def vista_usuarios(page, id_empleado = None, nombres = "", apellidos = ""):
     def actualiza_tabla():
         """Funcion que actualiza la tabla luego de insertar , actualizar o eliminar un usuario"""
 
+        filtro_rol = filtro.value
+
         datatable.rows.clear()
         for usuario in usuarios.obtener_datos():
+                
+                if filtro_rol != "Todos" and usuario[6] != filtro_rol:
+                    continue
 
                 datatable.rows.append(
 
@@ -395,7 +413,8 @@ def vista_usuarios(page, id_empleado = None, nombres = "", apellidos = ""):
                                 on_click = eliminacion_usuario,
                                 icon = ft.Icons.DELETE,
                                 icon_color = "white"         
-                            )
+                            ),
+                            filtro
 
                         ]
                     )
@@ -414,7 +433,7 @@ def vista_usuarios(page, id_empleado = None, nombres = "", apellidos = ""):
     return ft.Row(
             controls = [
                 table,
-                form
+                form,
             ],
         expand = True,
         

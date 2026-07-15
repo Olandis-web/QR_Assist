@@ -100,7 +100,18 @@ def vista_generar(page):
         on_submit = buscar
     )
 
-  
+    filtro = ft.Dropdown(
+        label = "Filtrar estado",
+        width = 180,
+        value = "Todos",
+        options = [
+            ft.dropdown.Option("Todos"),
+            ft.dropdown.Option("Activo"),
+            ft.dropdown.Option("Inactivo"),
+            ft.dropdown.Option("Licencia")
+        ],
+        on_select = lambda e: actualiza_tabla()
+    )
 
     def imprimir_qr(e, empleado):
         """Funcion que sirve para el QR temporal y lo envia a imprimir"""
@@ -170,11 +181,14 @@ def vista_generar(page):
     def actualiza_tabla():
         """Funcion que actualiza la tabla luego de insertar , actualizar o eliminar un empleado"""
 
+        filtro_estado = filtro.value
         datatable.rows.clear()
         for empleado in empleados.obtener_datos():
+                
+                if filtro_estado != "Todos" and empleado[5] != filtro_estado:
+                        continue
 
                 datatable.rows.append(
-
                     ft.DataRow(
 
                         cells = [
@@ -287,8 +301,15 @@ def vista_generar(page):
         padding = 20,
 
         content = ft.Column(
+            expand = True,
             controls = [
-                busqueda,
+
+                ft.Row(
+                    controls = [
+                        busqueda,
+                        filtro,
+                    ]
+                ),
 
                 ft.Column(
                     expand = True,
@@ -301,7 +322,7 @@ def vista_generar(page):
         )
     )
 
-    return ft.Column(
+    return ft.Row(
             controls = [
                 table
             ],
