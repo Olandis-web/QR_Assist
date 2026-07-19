@@ -7,7 +7,7 @@ def obtener_datos():
     conectar = conexion.conexion()
     cursor = conectar.cursor()
     
-    cursor.execute("Select Distinct * from Usuarios")
+    cursor.execute("Select * from Usuarios")
 
     datos = cursor.fetchall()
     
@@ -45,7 +45,38 @@ def actualizar_usuario(id_usuario,id_empleado, nombres, apellidos, username, con
     conectar.commit()
     conectar.close()
 
+def verificar_contrasena(id_usuario, contrasena_actual):
+    """Verifica que la contraseña ingresada coincida con la almacenada"""
 
+    conectar = conexion.conexion()
+    cursor = conectar.cursor()
+
+    cursor.execute("Select Contraseña from Usuarios Where ID_Usuario = ?",
+                   (id_usuario,)
+                   )
+
+    resultado = cursor.fetchone()
+    conectar.close()
+
+    if not resultado:
+        return False
+
+    return resultado[0] == contrasena_actual
+
+
+def cambiar_contrasena(id_usuario, contrasena_nueva):
+    """Actualiza la contraseña de un usuario en la base de datos"""
+
+    conectar = conexion.conexion()
+    cursor = conectar.cursor()
+
+    cursor.execute("Update Usuarios Set Contraseña = ? Where ID_Usuario = ?",
+                   (contrasena_nueva, id_usuario)
+                   )
+
+    conectar.commit()
+    conectar.close()
+    
 def eliminar_usuario(id_usuario):
     """Funcion que elimina informacion a la base de datos mediante el formularion de usuarios"""
     

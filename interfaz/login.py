@@ -1,7 +1,8 @@
 import flet as ft
 from database import usuarios
-from interfaz import vista_limitacion
+from interfaz_usuario import menu_usuario
 import asyncio
+import sesion
 
 
 def login(page: ft.Page):
@@ -17,6 +18,18 @@ def login(page: ft.Page):
         )
 
         if resultado:
+
+            sesion.usuario_actual = {
+                "id_usuario": resultado[0],
+                "id_empleado": resultado[1],
+                "nombre": resultado[2],
+                "apellido": resultado[3],
+                "usuario": resultado[4],
+                "rol": resultado[6]
+            }
+
+            id_empleado_login = resultado[1]
+            rol = resultado[6]
 
             carga = ft.AlertDialog(
                 modal = True,
@@ -47,8 +60,8 @@ def login(page: ft.Page):
                 page.update()
 
             else: 
-                from interfaz.vista_limitacion import menu_limite
-                page.add(menu_limite(page))
+                from interfaz_usuario.menu_usuario import vista_menu
+                page.add(vista_menu(page, id_empleado_login))
                 page.update()
                        
         else: 

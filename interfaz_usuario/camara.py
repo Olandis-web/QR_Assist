@@ -9,26 +9,25 @@ import openpyxl as xl
 import os
 from datetime import datetime
 from pyzbar.pyzbar import decode
-from Database import conexion
-from Database.empleados import buscar_empleado
+from database import conexion
+from database.empleados import buscar_empleado
 from openpyxl.styles import Font, PatternFill, Border, Side, Alignment
 
 
 class CamaraApp(ft.Container):
     
-    def __init__(self, page):
+    def __init__(self, page, id_empleado_login):
         super().__init__(expand=True)
         self.bgcolor = ft.Colors.BLUE_GREY_900 
         self.alignment = ft.Alignment(0, 0)
         
         self.main_page = page
+        self.id_empleado_login = id_empleado_login
         self.is_running = True
         self.capture = None
+
+        self.registro_diario = []
         
-        # Variables de control para evitar registros repetidos
-        self.mañana = []
-        self.tarde = []
-        self.noche = []
         
         #Información mostrada en el panel lateral
         self.lbl_titulo = ft.Text("Información de Asistencia", color="white", size=22, weight="bold")
@@ -37,6 +36,7 @@ class CamaraApp(ft.Container):
         
         self.lbl_resultado_titulo = ft.Text("Usuario Identificado:", color="white54", size=18)
         self.lbl_nombre = ft.Text("Esperando código QR...", color="yellow", size=24, weight="bold", text_align=ft.TextAlign.CENTER)
+        self.lbl_estado = ft.Text("", size = 20, weight = "bold", text_align=ft.TextAlign.CENTER)
         self.lbl_mensaje = ft.Text("", size=18, weight="bold", text_align=ft.TextAlign.CENTER)
         
         # Contenedor que muestra los datos del empleado
@@ -54,6 +54,8 @@ class CamaraApp(ft.Container):
                 ft.Container(expand=True), 
                 self.lbl_resultado_titulo,
                 self.lbl_nombre,
+                self.lbl_estado,
+                self.lbl_mensaje,
                 ft.Container(expand=True)
             ],
             alignment=ft.MainAxisAlignment.CENTER,
@@ -89,6 +91,12 @@ class CamaraApp(ft.Container):
             if not ret:
                 self.capture.release()
                 self.capture = cv2.VideoCapture(0)
+
+        cv2.namedWindow("Camara", cv2.WINDOW_NORMAL)
+        cv2.resizeWindow("Camara", 640, 480)
+        cv2.moveWindow("Camara", 900, 150)
+
+        #cv2.setWindowProperty("Camara", cv2.WND_PROP_TOPMOST, 1)
         
         while self.is_running:
             if self.capture is None or not self.capture.isOpened():
@@ -99,6 +107,10 @@ class CamaraApp(ft.Container):
             if not ret:
                 time.sleep(0.01)
                 continue
+
+            color_rect = (0,255,0)
+            mensaje_overlay = ""
+            color_mensaje = (0, 255, 0)
              
             # Dibuja el área de detección del QR
             cv2.putText(frame, 'Localizar el codigo QR', (160, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
@@ -127,8 +139,36 @@ class CamaraApp(ft.Container):
             for codes in decode(frame):
                 try:
                     
-                    info = codes.data.decode('utf-8')
-                    codigo = int(info)
+                    codigo_qr = codes.data.decode('utf-8')
+                    
+                    from database.empleados import buscar_por_qr
+                    empleado = buscar_por_qr(codigo_qr)
+
+                    if not empleado:
+                        mensaje_overlay = "QR no reconocido"
+                        color_rect = (0, 0, 255)
+                        color_mensaje = (0, 0, 255)
+                        self.lbl_nombre.value = "QR no reconocido"
+                        self.lbl_nombre.color = ft.Colors.RED
+                        self.lbl_nombre.update()
+                        self.main_page.update()
+                        time.sleep(2)
+                        continue
+
+                    id_empleado = empleado[0]
+                    nombre_completo = f"{empleado[1]} {empleado[2]}"
+
+                    if id_empleado != self.id_empleado_login:
+                        color_rect = (0, 165, 255)
+                        mensaje_overlay = "QR no autorizado"
+                        color_mensaje = (0, 165, 255)
+                        self.lbl_nombre.value = "QR no autorizado"
+                        self.lbl_nombre.color = ft.Colors.RED
+                        self.lbl_nombre.update()
+                        self.main_page.update()
+                        time.sleep(2)
+
+                        continue
                     
                     pts = np.array([codes.polygon], np.int32)
                     xi, yi = codes.rect.left, codes.rect.top
@@ -136,69 +176,94 @@ class CamaraApp(ft.Container):
                     cv2.polylines(frame, [pts], True, (255, 255, 0), 5)
                     
                     # Busca al empleado en la base de datos
-                    empleado = buscar_empleado(codigo)
-                    
-                    # Muestra el nombre del empleado encontrado
-                    if empleado:
-                       nombre_completo = f"{empleado[0]} {empleado[1]}"
-
-                       self.lbl_nombre.value = nombre_completo
-                       self.lbl_nombre.color = ft.Colors.GREEN_ACCENT_400
-                    else:
-                        nombre_completo = f"ID{codigo}"
-                       
-                        self.lbl_nombre.value = "Empleado no encontrado"
-                        self.lbl_nombre.color = ft.Colors.RED
-
+                    self.lbl_nombre.value = nombre_completo
+                    self.lbl_nombre.color = ft.Colors.GREEN_ACCENT_400
                     self.lbl_nombre.update()
+                    self.main_page.update()
+
                  
                     # Registra de asistencia según el horario de Lunes a Viernes
                     if 4 >= diasem >= 0:
-                        
-                        # Bloque Mañana (Antes de las 12 PM)
-                        if h < 12:
-                            if codigo not in self.mañana:
-                                self.mañana.append(codigo)
-                                self._guardar_excel(nomar, "Mañana", nombre_completo)
-                                cv2.putText(frame, str(codigo),  (xi - 15, yi - 15), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2)
-                            elif codigo in self.mañana:
-                                cv2.putText(frame, 'El ID ' + str(codigo), (xi - 65, yi - 45), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
-                                cv2.putText(frame, 'Fue registrado', (xi - 65, yi - 15), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
-                                
-                        # Bloque Tarde (De 12 PM a 5:59 PM)
-                        elif 12 <= h < 18:
-                            if codigo not in self.tarde:
-                                self.tarde.append(codigo)
-                                self._guardar_excel(nomar, "Tarde", nombre_completo)
-                                cv2.putText(frame, str(codigo), (xi - 15, yi - 15), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2)
-                            elif codigo in self.tarde:
-                                cv2.putText(frame, 'El ID ' + str(codigo), (xi - 65, yi - 45), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
-                                cv2.putText(frame, 'Fue registrado', (xi - 65, yi - 15), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
 
-                        # Bloque Noche (De 6 PM en adelante)
-                        elif h >= 18:
-                            if codigo not in self.noche:
-                                self.noche.append(codigo)
-                                self._guardar_excel(nomar, "Noche", nombre_completo)
-                                cv2.putText(frame, str(codigo), (xi - 15, yi - 15), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2)
-                            elif codigo in self.noche:
-                                cv2.putText(frame, 'El ID ' + str(codigo), (xi - 65, yi - 45), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
-                                cv2.putText(frame, 'Fue registrado', (xi - 65, yi - 15), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+                        hora_actual = datetime.now().time()
+
+                        if hora_actual.hour < 8:
+                            estado = "A Tiempo"
+
+                        elif hora_actual.hour == 8 and hora_actual.minute == 0:
+                            estado = "A Tiempo"
+
+                        else:
+                            estado = "Tardanza"
+
+                    
+                        self.lbl_estado.value = f"{estado}"
+                        self.lbl_estado.color = ft.Colors.GREEN if estado == "A Tiempo" else ft.Colors.ORANGE
+                        self.lbl_estado.update()
+                        self.main_page.update()
+
+                        print("Estado que se guardará:", estado)
+                        
+                        self._guardar_sql(id_empleado, estado)
+                        self._guardar_excel(nomar, estado, nombre_completo)
+
+                        color_rect = (0, 255, 0)
+                        mensaje_overlay = f"{nombre_completo} - {estado}"
+                        color_mensaje = (0, 255, 0)
+
+                        self.lbl_nombre.value = nombre_completo
+                        self.lbl_nombre.color = ft.Colors.GREEN_ACCENT_400
+                        self.lbl_nombre.update()
+                        self.main_page.update()
+
+                        cv2.imshow("Camara", frame)
+
+                        cv2.putText(
+                            frame,
+                            f"{nombre_completo} - {estado}",
+                            (xi - 15, yi - 15),
+                            cv2.FONT_HERSHEY_SIMPLEX,
+                            1,
+                            (255, 255, 0),
+                            2
+                        )
+
+                        cv2.imshow("Camara", frame)
+                        cv2.waitKey(1)
+                        time.sleep(2.5)
+
+                        self.is_running = False
+                        break
+
                                 
                 except Exception as e:
                     print(f"Error procesando QR: {e}")
-            
+
+            if mensaje_overlay:
+                overlay = frame.copy()
+                cv2.rectangle(overlay, (0, 420), (640, 480), (0, 0, 0), -1)
+                cv2.addWeighted(overlay, 0.6, frame, 0.4, 0, frame)
+                cv2.putText(
+                    frame,
+                    mensaje_overlay,
+                    (20, 460),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.8,
+                    color_mensaje,
+                    2
+                )
+
+            cv2.rectangle(frame, (170, 100), (470, 400), color_rect, 2)
+
             try:
                 if self.is_running:
                     self.main_page.update()
             except Exception:
-                pass    
+                pass
             
-            cv2.imshow("camara", frame)
-            if cv2.waitKey(1) == 27 : #cierra con el teclado esc
-                break
+            cv2.imshow("Camara", frame)
+            cv2.waitKey(1) #cierra con el teclado esc
             
-            time.sleep(0.03)
             
         self.is_running = False
 
@@ -272,7 +337,48 @@ class CamaraApp(ft.Container):
         except Exception as e:
             print(f"Error escribiendo en Excel: {e}")
     
-   
+
+    def _guardar_sql(self, id_empleado, estado):
+        
+        conn = conexion.conexion()
+        cursor = conn.cursor()
+
+        empleado = buscar_empleado(id_empleado)
+
+        if not empleado:
+            print(f"Empleado{id_empleado} no existe")
+            conn.close()
+            return
+
+        cursor.execute("""SELECT COUNT(*) FROM Asistencia
+                       WHERE ID_Empleado = ?
+                       AND Fecha = CAST(GETDATE() AS DATE)""",(id_empleado,))
+        
+        existe = cursor.fetchone()[0]
+
+        if existe > 0:
+            conn.close()
+            return
+        
+        cursor.execute("""INSERT INTO Asistencia
+                       (
+                        ID_Empleado,
+                        Fecha,
+                        Hora_entrada,
+                        Estado
+                       )
+
+                       VALUES
+                       (
+                        ?,
+                        CAST(GETDATE() AS DATE),
+                        CAST(GETDATE() AS TIME),
+                        ?
+                       )
+                       """, (id_empleado, estado))
+        conn.commit()
+        cursor.close()
+        conn.close()
           
     def detener_camara(self):
         """Esta función detiene la cámara y libera los recursos utilizados"""

@@ -1,5 +1,5 @@
 import pyodbc
-from Database import conexion
+from database import conexion
 
 def obtener_datos():
     """Esta funcion muestra la informacion de la base de datos en la tabla"""
@@ -7,7 +7,7 @@ def obtener_datos():
     conectar = conexion.conexion()
     cursor = conectar.cursor()
     
-    cursor.execute("Select Distinct * from Empleados")
+    cursor.execute("Select * from Empleados")
 
     datos = cursor.fetchall()
     
@@ -15,7 +15,7 @@ def obtener_datos():
 
     return datos
 
-def insertar_empleado(nombres, apellidos, cargo, qr, estado):
+def insertar_empleado(nombres, apellidos, cargo, estado, qr=None):
     """Funcion que inserta informacion a la base de datos mediante el formularion de empleados"""
     
     conectar = conexion.conexion()
@@ -31,7 +31,7 @@ def insertar_empleado(nombres, apellidos, cargo, qr, estado):
 
     
 
-def actualizar_empleado(id_empleado, nombres, apellidos, cargo, qr, estado):
+def actualizar_empleado(id_empleado, nombres, apellidos, cargo, estado, qr=None):
     """Funcion que actualiza informacion a la base de datos mediante el formularion de empleados"""
 
     conectar = conexion.conexion()
@@ -72,5 +72,23 @@ def buscar_empleado(id_empleado):
     empleado = cursor.fetchone()
     conectar.close()
     return empleado
-        
+
+def buscar_por_qr(qr):
+    """Busca un empleado por su codigo QR en camara"""
+
+    conectar = conexion.conexion()
+    cursor = conectar.cursor()
+
+    cursor.execute(
+        """SELECT ID_Empleado, Nombres, Apellidos
+        FROM Empleados
+        WHERE Codigo_qr = ?""", (qr,)
+    )
+
+    resultado = cursor.fetchone()
+    conectar.close()
+    return resultado
+    
+    
+
   

@@ -32,7 +32,7 @@ def vista_usuarios(page, id_empleado = None, nombres = "", apellidos = ""):
         border_color = "white",
         options = [
             ft.dropdown.Option("Administrador"),
-            ft.dropdown.Option("Operador")
+            ft.dropdown.Option("Empleado")
         ]
     )
 

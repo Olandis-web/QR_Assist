@@ -1,14 +1,13 @@
 import flet as ft
-from interfaz.vista_empleados import vista_empleados
-from interfaz.vista_usuarios import vista_usuarios
-from interfaz.vista_reportes import vista_reportes
-from interfaz.vista_generar import vista_generar
+from interfaz_usuario.camara import CamaraApp
+from interfaz_usuario.cambiar_contrasena import dialogo_cambiar_contrasena
 import sesion
-import asyncio
 
-def vista_menu(page):
+
+def vista_menu(page :ft.Page, id_empleado_login):
+    
     '''Esta funcion muestra el menu principal, con la division de la barra lateral y la parte del contenido.
-    La barra lateral contiene los atajos hacia los formularios para hacer las acciones del sistema'''
+    '''
 
     def cerrar_sesion(e):
         """Permite cerrar sesion dentro del programa"""
@@ -21,103 +20,85 @@ def vista_menu(page):
         page.clean()
         page.add(login(page))
         page.update()
-
+        
+    def abrir_cambio_contrasena(e):
+        dialogo_cambiar_contrasena(page, sesion.usuario_actual["id_usuario"])
+    
     def cambio_menu(contenido):
         '''Esta funcion se encarga de lograr el cambio de pagina 
-        hacia los elementos elgidos'''
-
-        area_principal.content = ft.Container(
-            expand=True,
-            alignment=ft.Alignment.CENTER,
-            content=ft.ProgressRing(),
-        )
+        hacia los elementos elegidos'''
+        
+        # Detiene la cámara antes de cambiar de vista    
+        if hasattr(area_principal.content, "detener_camara"):
+            area_principal.content.detener_camara()        
+            
+        area_principal.content = contenido
         page.update()
-
-        async def cargar():
-            await asyncio.sleep(0.5)
-
-            area_principal.content = contenido
-            page.update()
-
-        page.run_task(cargar)
-
-        return area_principal
     
-
+    
+    # Contenedor donde se cargan las vistas del sistema   
     area_principal = ft.Container(
         expand = True,
         bgcolor = ft.Colors.BLUE_GREY_900,
-        padding = 10,
+        padding = 20,
+        alignment = ft.alignment.Alignment(0,0),
+        content=ft.Container()
+
     )
-
-
+    
+    # Barra lateral de navegación 
     barra = ft.Container(
         width = 250,
         padding = 20,
-        bgcolor = ft.Colors.BLUE_GREY_800,
+        bgcolor = ft.Colors.BLUE_GREY_700,
         content = ft.Column([
             
+            # Logo y nombre del sistema
             ft.Row(
                 controls= [
                     ft.Icon(ft.Icons.QR_CODE, color = "white", size = 35),
                     ft.Text("QR Assist", color = "white", size = 28, weight = "bold")
+                  
                 ],
                 alignment = ft.MainAxisAlignment.CENTER,
             ),
 
             ft.Divider(color = ft.Colors.WHITE24),
-    
-            ft.ElevatedButton(
-                "Empleados",
-                icon = ft.Icons.BADGE,
-                width = 200,
-                height = 45,
-                style = ft.ButtonStyle(
-                    shape = ft.RoundedRectangleBorder(radius = 5),
-                ),
-                on_click = lambda e: cambio_menu(vista_empleados())
             
-            ),
-                
-
+            # Mensaje de bienvenida
+            ft.Container(
+                padding=ft.padding.only(top=10, bottom=10),
+                content=ft.Text(
+                    "Bienvenido/a al sistema", 
+                    color="white", 
+                    size=13,
+                    weight = "bold",
+                    text_align=ft.TextAlign.CENTER
+                    
+                    
+                    )
+                ),
+            
+            ft.Container(expand=True),
+           
+           # Botón para abrir el módulo de asistencia
             ft.ElevatedButton(
-                "Reportes",
+                "Asistencia",
                 icon = ft.Icons.WATCH_LATER,
                 width = 200,
                 height = 45,
                 style = ft.ButtonStyle(
                     shape = ft.RoundedRectangleBorder(radius = 5),
                 ),
-                on_click = lambda e: cambio_menu(vista_reportes(page, cambio_menu))
+                on_click = lambda e: cambio_menu(CamaraApp(page,id_empleado_login))
            
             ),
 
-            ft.ElevatedButton(
-                "Usuarios",
-                icon = ft.Icons.PERSON,
-                width = 200,
-                height = 45,
-                style = ft.ButtonStyle(
-                    shape = ft.RoundedRectangleBorder(radius = 5),
-                ),
-                on_click = lambda e: cambio_menu(vista_usuarios(page))
-            ),
-
-            ft.ElevatedButton(
-                "Generar QRs",
-                icon = ft.Icons.QR_CODE_2,
-                width = 200,
-                height = 54,
-                style = ft.ButtonStyle(
-                    shape = ft.RoundedRectangleBorder(radius = 5),
-                ),
-                on_click = lambda e: cambio_menu(vista_generar(page))
-            ),           
-
             ft.Container(expand = True),
             ft.Divider(color = ft.Colors.WHITE24),
-
-            ft.Row(
+            
+            # Información del usuario 
+             ft.Row(
                 alignment = ft.MainAxisAlignment.CENTER,
                 vertical_alignment = ft.CrossAxisAlignment.CENTER,
                 controls = [
@@ -133,6 +114,15 @@ def vista_menu(page):
                             ),
                         ),
                         items = [
+                            ft.PopupMenuItem(
+                              content = ft.Row(
+                               controls = [
+                                  ft.Icon(ft.Icons.LOCK_RESET),
+                                  ft.Text("Cambiar contraseña"),
+                                ]
+                            ),
+                            on_click = abrir_cambio_contrasena,
+                         ),
                             ft.PopupMenuItem(),
                             ft.PopupMenuItem(
                                 content = ft.Row(
@@ -147,26 +137,26 @@ def vista_menu(page):
                     ),
 
                     ft.Column(
-                        spacing = 0,
-                        expand = True,
-                        horizontal_alignment = ft.CrossAxisAlignment.START,
-                        controls = [
+                        spacing=0,
+                        expand=True,
+                        horizontal_alignment=ft.CrossAxisAlignment.START,
+                        controls=[
                             ft.Text(
                                 sesion.usuario_actual["nombre"],
-                                color = "white",
-                                weight = "bold",
-                                size = 14,
-                                max_lines = 1,
-                                overflow = ft.TextOverflow.ELLIPSIS,
+                                color="white",
+                                weight="bold",
+                                size=14,
+                                max_lines=1,
+                                overflow=ft.TextOverflow.ELLIPSIS,
                             ),
 
                             ft.Text(    
                                 sesion.usuario_actual["apellido"],
-                                color = "white",
+                                color="white",
                                 weight = "bold",
-                                size = 14,
-                                max_lines = 1,
-                                overflow = ft.TextOverflow.ELLIPSIS,
+                                size=14,
+                                max_lines=1,
+                                overflow=ft.TextOverflow.ELLIPSIS,
                             ),
                         ],
                     ),
@@ -179,13 +169,16 @@ def vista_menu(page):
                 size = 14,
                 text_align = ft.TextAlign.RIGHT,
             ),
-        ])  
+        ])
     )
-
-
+# Retorna la estructura principal del menú
     return ft.Row([
         barra,
         area_principal
     ],
     expand = True
     )
+
+
+       
+    
