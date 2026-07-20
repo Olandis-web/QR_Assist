@@ -1,6 +1,7 @@
 import flet as ft
 from interfaz_usuario.camara import CamaraApp
 import sesion
+from interfaz_usuario.cambiar_contrasena import dialogo_cambiar_contrasena
 
 
 def vista_menu(page :ft.Page, id_empleado_login):
@@ -19,6 +20,10 @@ def vista_menu(page :ft.Page, id_empleado_login):
         page.clean()
         page.add(login(page))
         page.update()
+
+        
+    def abrir_cambio_contrasena(e):
+        dialogo_cambiar_contrasena(page, sesion.usuario_actual["id_usuario"])
 
     def cambio_menu(contenido):
         '''Esta funcion se encarga de lograr el cambio de pagina 
@@ -197,8 +202,19 @@ def vista_menu(page :ft.Page, id_empleado_login):
                                 weight = "bold",
                                 color = "white",
                             ),
-                        ),
+                        ),  
+
                         items = [
+                            ft.PopupMenuItem(
+                                content = ft.Row(
+                                    controls = [
+                                        ft.Icon(ft.Icons.LOCK_RESET),
+                                        ft.Text("Cambiar contraseña"),
+                                    ]
+                                ),
+                                on_click = abrir_cambio_contrasena,
+                            ),
+
                             ft.PopupMenuItem(),
                             ft.PopupMenuItem(
                                 content = ft.Row(
