@@ -10,11 +10,12 @@ def vista_reportes(page, cambio_menu):
     '''Muestra el dashboard de reportes con cards de métricas, gráfico semanal,
     botones de exportación y tabla de últimos registros de asistencia.'''
 
-    def actualizar_dashboard(e):
-        """Permite actualizar los datos de la vista de reportes"""
+    # Conecta con la base de datos antes de mostrar el modulo. Ejecuta todas las consultas para mostrar la informacion
 
     conectar = conexion.conexion()
     cursor = conectar.cursor()
+
+    # Se llama todas las funciones que permitan el funcionamiento de los reportes
 
     activos, total = reportes.total_empleados(cursor)
     presentes = reportes.presentes(cursor)
@@ -177,7 +178,7 @@ def vista_reportes(page, cambio_menu):
                     spacing = 16,
                     controls = [
 
-                        # ── COLUMNA IZQUIERDA — CARDS ──────────────────────────
+                        # Columna Izquierda (Cards)
                         ft.Column(
                             width = 160,
                             spacing = 8,
@@ -256,13 +257,12 @@ def vista_reportes(page, cambio_menu):
                             ]
                         ),
 
-                        # ── COLUMNA CENTRAL ────────────────────────────────────
+                        # Columna Central
                         ft.Column(
                             spacing = 12,
 
                             controls = [
 
-                                # Gráfico semanal
                                 ft.Container(
                                     width = 450,
                                     height = 190,
@@ -285,8 +285,6 @@ def vista_reportes(page, cambio_menu):
                                         ]
                                     )
                                 ),
-
-                                # Mini-cards
 
                                 # Exportar reportes
                                 ft.Container(
@@ -391,7 +389,7 @@ def vista_reportes(page, cambio_menu):
 
                                             ft.Divider(color = "white12", height = 1),
 
-                                            # Asistencia (pendiente — botones desactivados)
+                                            # Asistencia 
                                             ft.Column(
                                                 spacing = 8,
                                                 controls = [
@@ -414,7 +412,6 @@ def vista_reportes(page, cambio_menu):
                                                                     ]
                                                                 ),
                                                                 bgcolor = "#37474f",
-                                                                disabled = True,
                                                                 style = ft.ButtonStyle(shape = ft.RoundedRectangleBorder(radius = 8))
                                                             ),
                                                             ft.ElevatedButton(
@@ -426,7 +423,6 @@ def vista_reportes(page, cambio_menu):
                                                                     ]
                                                                 ),
                                                                 bgcolor = "#37474f",
-                                                                disabled = True,
                                                                 style = ft.ButtonStyle(shape = ft.RoundedRectangleBorder(radius = 8))
                                                             )
                                                         ]
@@ -439,6 +435,8 @@ def vista_reportes(page, cambio_menu):
                             ]
                         ),
 
+                        # Columna Derecha (Graficos)
+
                         ft.Column(
                             expand = True,
                             spacing = 12,
@@ -450,6 +448,8 @@ def vista_reportes(page, cambio_menu):
                                     bgcolor = ft.Colors.BLUE_GREY_800,
                                     border_radius = 10,
                                     padding = 16,
+
+                                    # Pie Chart
 
                                     content = ft.Column(
                                         horizontal_alignment = ft.CrossAxisAlignment.CENTER,
@@ -496,7 +496,8 @@ def vista_reportes(page, cambio_menu):
                                     )
                                 ),
 
-                                
+                                # Bar Chart
+
                                 ft.Container(
                                     height = 185, 
                                     width = 600,
@@ -522,7 +523,7 @@ def vista_reportes(page, cambio_menu):
                     ]
                 ),
 
-                # ── TABLA DE ÚLTIMOS REGISTROS — ANCHO COMPLETO ────────────────
+                # Tabla de ultimos registros
                 ft.Container(
                     height = 230,
                     bgcolor = ft.Colors.BLUE_GREY_800,
@@ -548,13 +549,15 @@ def vista_reportes(page, cambio_menu):
         )
     )
 
-    #Muestra los empleados inactivos o en licencia en una notificacion
+    # Muestra los empleados inactivos o en licencia en una notificacion
 
     licencia, inactivo = reportes.no_activos(cursor)
     conectar.close()
 
     licencia = licencia or 0
     inactivo = inactivo or 0
+
+    # Si los que estan en licencia o inactivos son mayores que cero, se muestra la notificacion
 
     if licencia > 0  or inactivo > 0:
         mensaje = []

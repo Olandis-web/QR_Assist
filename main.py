@@ -1,6 +1,8 @@
 import flet as ft
 from interfaz import login
 from database import reportes
+
+# Ayuda a optimizar la pantalla de reportes
 reportes.generar_pie(0, 0, 0)
 
 def main(page: ft.Page):

@@ -263,7 +263,7 @@ def vista_menu(page :ft.Page, id_empleado_login):
             ),
         ])
     )
-# Retorna la estructura principal del menú
+# Retorna la estructura principal del menú 
     return ft.Row([
         barra,
         area_principal

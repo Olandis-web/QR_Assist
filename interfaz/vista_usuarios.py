@@ -5,6 +5,8 @@ from database import usuarios
 def vista_usuarios(page, id_empleado = None, nombres = "", apellidos = ""):
     '''Muestra el contenido de el formulario de usuarios.'''
 
+    # Estructura del formulario
+
     nombre = ft.TextField(
         value = nombres,
         label = "Nombres", 

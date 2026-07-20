@@ -6,6 +6,8 @@ from database import usuarios
 def vista_empleados():
     '''Muestra el contenido de el formulario de empleados.'''
 
+    # Formulario de los empleados 
+
     nombre = ft.TextField(
         label = "Nombres", 
         border_color = "white"
@@ -33,9 +35,13 @@ def vista_empleados():
 
     def buscar(e):
         """Funcion para hacer funcionar la barra de busqueda"""
+
+        # Indica que la busqueda permita minusculas
         
         nom = busqueda.value.lower()
         datatable.rows.clear()
+        
+        # For para siempre poder buscar con los datos del datatable
 
         for empleado in empleados.obtener_datos():
             nombre = f"{empleado [1]} {empleado[2]}".lower()
@@ -51,6 +57,8 @@ def vista_empleados():
                         on_select_change = lambda e, empleado = empleado:
                         seleccionar(empleado),
 
+                        # Celdas de la tabla SQL
+
                         cells = [
                             ft.DataCell(ft.Text(f"{empleado[0]}", color = "white")),
                             ft.DataCell(ft.Text(f"{empleado[1]}", color = "white")),
@@ -58,6 +66,8 @@ def vista_empleados():
                             ft.DataCell(ft.Text(f"{empleado[3]}", color = "white")),
                             ft.DataCell(ft.Text(f"{empleado[4]}", color = "white")),
                             ft.DataCell(ft.Text(f"{empleado[5]}", color = "white")),
+
+                            # Boton que permite que el empleado tenga su perfil de usuario
 
                             ft.DataCell(
                                 ft.IconButton(
@@ -71,6 +81,9 @@ def vista_empleados():
                                     creacion_usuario(e, empleado)
 
                                 )
+
+                                # Si el perfil de usuario fue creado muestra un label de listo
+
                                 if not usuario_existente 
                                 
                                 else 
@@ -82,6 +95,8 @@ def vista_empleados():
                 )
                 datatable.update()
                                 
+    # Seccion de busqueda
+
     busqueda = ft.TextField(
         label = "Buscar por nombre",
         suffix_icon = ft.Icons.SEARCH,
@@ -89,6 +104,8 @@ def vista_empleados():
         label_style = ft.TextStyle(color = "white"),
         on_submit = buscar
     )
+
+    # Seccion de filtro de busqueda
 
     filtro = ft.Dropdown(
         label = "Filtrar estado",
@@ -127,6 +144,8 @@ def vista_empleados():
         filtro_estado = filtro.value
         datatable.rows.clear()
         for empleado in empleados.obtener_datos():
+                
+                # Una condicional que permite agrupar o actualizar la tabla dependiendo de la opcion del filtro
                 
                 if filtro_estado != "Todos" and empleado[5] != filtro_estado:
                     continue
@@ -224,6 +243,8 @@ def vista_empleados():
         if id_empleado is None:
             return
         
+        # Ventana que da una confirmacion de seguridad
+
         dialog = ft.AlertDialog(
             modal = True,
 
@@ -361,7 +382,8 @@ def vista_empleados():
             )
         e.page.update()
 
-        
+    # Construye los datos de la tabla de empleados
+
     datatable = ft.DataTable(
         expand = True,
         column_spacing = 50,
@@ -383,7 +405,9 @@ def vista_empleados():
 
                         rows = []
     )     
-    actualiza_tabla()          
+    actualiza_tabla()        
+
+    # Boton volver   
 
     volver = ft.TextButton("Volver",
         icon = ft.Icons.ARROW_BACK,
@@ -395,6 +419,8 @@ def vista_empleados():
     on_click = lambda e: volver_menu(e.page)
     )
         
+
+    # Invoca formulario con los textfields ya creados con anterioridad
 
     form = ft.Container(
         width = 260,
@@ -431,6 +457,7 @@ def vista_empleados():
         )      
     )
 
+    # Invoca la tabla con los datos
 
     table = ft.Container(
         expand = True,
@@ -461,6 +488,8 @@ def vista_empleados():
                                 icon = ft.Icons.DELETE,
                                 icon_color = "white"         
                             ),
+
+                            # Hace que aparezca el filtro al lado de los botones de agregar, actualizar y eliminar
                             filtro
                         ]
                     )
@@ -475,6 +504,8 @@ def vista_empleados():
             ]
         )
     )
+
+    # LLama a la estructura del modulo para que aparezcan
 
     return ft.Row(
             controls = [

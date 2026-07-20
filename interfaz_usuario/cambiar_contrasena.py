@@ -7,6 +7,8 @@ def dialogo_cambiar_contrasena(page: ft.Page, id_usuario):
     su propia contraseña, solicitando la contraseña actual como verificacion
     y la nueva contraseña como confirmacion."""
 
+    # Estructura de la ventana (Dialogo)
+
     contrasena_actual = ft.TextField(
         label="Contraseña actual",
         password=True,

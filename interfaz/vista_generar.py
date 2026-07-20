@@ -8,6 +8,7 @@ from database import empleados
 def crear_codigo():
     """Crea un codigo QR aleatorio"""
 
+    # Codigos QR completamente aleatorios y de 16 digitos
     return ''.join(
         random.choices(
             string.ascii_uppercase + string.digits,
@@ -119,6 +120,8 @@ def vista_generar(page):
 
         codigo = empleado[4]
 
+        # Si no tiene codigo QR no puede imprimir
+
         if not codigo:
             return
 
@@ -129,6 +132,8 @@ def vista_generar(page):
 
         def eliminar_qr(id_empleado):
             """Elimina el QR asignado al empleado"""
+
+            # Sentencias SQL para poder eliminar el QR del empleado
 
             conectar = conexion.conexion()
             cursor = conectar.cursor()
@@ -150,6 +155,7 @@ def vista_generar(page):
             dialog.open = False
             page.update()
 
+        # Ventana de confirmacion
 
         dialog = ft.AlertDialog(
             modal=True,

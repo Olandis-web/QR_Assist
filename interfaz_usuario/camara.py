@@ -336,6 +336,7 @@ class CamaraApp(ft.Container):
     
 
     def _guardar_sql(self, id_empleado, estado):
+        """Esta funcion guarda los ponches de empleados en la base de datos"""
         
         conn = conexion.conexion()
         cursor = conn.cursor()
@@ -357,6 +358,8 @@ class CamaraApp(ft.Container):
             conn.close()
             return False
         
+        # Sentencia SQL para insertar los datos a la tabla de Asistencia
+
         cursor.execute("""INSERT INTO Asistencia
                        (
                         ID_Empleado,
