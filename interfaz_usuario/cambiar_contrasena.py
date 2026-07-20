@@ -89,8 +89,8 @@ def dialogo_cambiar_contrasena(page: ft.Page, id_usuario):
             width=320,
         ),
         actions=[
-            ft.TextButton("Cancelar", on_click=cerrar),
-            ft.ElevatedButton("Confirmar", on_click=confirmar),
+            ft.ElevatedButton("Cancelar", color = "white", on_click=cerrar),
+            ft.ElevatedButton("Confirmar", color = "white", bgcolor = "red", on_click=confirmar),
         ],
         actions_alignment=ft.MainAxisAlignment.END,
     )
