@@ -4,11 +4,8 @@ import matplotlib.pyplot as plt
 
 
 
-def total_empleados():
+def total_empleados(cursor):
     """Retorna la cantidad de empleados activos y el total registrados"""
-
-    conectar = conexion.conexion()
-    cursor = conectar.cursor()
 
     cursor.execute("SELECT COUNT(*) FROM Empleados WHERE Estado = 'Activo'")
     activos = cursor.fetchone()[0]
@@ -16,15 +13,11 @@ def total_empleados():
     cursor.execute("SELECT COUNT(*) FROM Empleados")
     total = cursor.fetchone()[0]
 
-    conectar.close()
     return activos, total
 
 
-def presentes():
+def presentes(cursor):
     """Retorna la cantidad de empleados presentes hoy (A tiempo y Tardanza)"""
-
-    conectar = conexion.conexion()
-    cursor = conectar.cursor()
 
     cursor.execute("""
         SELECT COUNT(*) FROM Asistencia a
@@ -35,15 +28,11 @@ def presentes():
     """)
 
     total = cursor.fetchone()[0]
-    conectar.close()
     return total
 
 
-def tardanzas():
+def tardanzas(cursor):
     """Retorna la cantidad de tardanzas registradas hoy"""
-
-    conectar = conexion.conexion()
-    cursor = conectar.cursor()
 
     cursor.execute("""
         SELECT COUNT(*) FROM Asistencia a
@@ -54,15 +43,12 @@ def tardanzas():
     """)
 
     total = cursor.fetchone()[0]
-    conectar.close()
     return total
 
 
-def ausentes():
+def ausentes(cursor):
     """Retorna empleados activos sin ningún registro de asistencia hoy"""
 
-    conectar = conexion.conexion()
-    cursor = conectar.cursor()
 
     cursor.execute("""
         SELECT COUNT(*) FROM Empleados
@@ -74,15 +60,11 @@ def ausentes():
     """)
 
     total = cursor.fetchone()[0]
-    conectar.close()
     return total
 
 
-def sin_qr():
+def sin_qr(cursor):
     """Retorna la cantidad de empleados sin QR asignado"""
-
-    conectar = conexion.conexion()
-    cursor = conectar.cursor()
 
     cursor.execute("""
         SELECT COUNT(*) FROM Empleados
@@ -90,15 +72,11 @@ def sin_qr():
     """)
 
     total = cursor.fetchone()[0]
-    conectar.close()
     return total
 
 
-def ultimos_registros():
+def ultimos_registros(cursor):
     """Retorna los últimos 10 registros de asistencia con nombre y cargo del empleado"""
-
-    conectar = conexion.conexion()
-    cursor = conectar.cursor()
 
     cursor.execute("""
         SELECT TOP 10
@@ -114,13 +92,11 @@ def ultimos_registros():
     """)
 
     datos = cursor.fetchall()
-    conectar.close()
     return datos
 
-def top_puntuales():
+def top_puntuales(cursor):
     """Muestra cuales son los 5 empleados mas puntuales"""
-    conectar = conexion.conexion()
-    cursor = conectar.cursor()
+
     cursor.execute("""
         SELECT TOP 5
             e.Nombres, e.Apellidos,
@@ -135,14 +111,12 @@ def top_puntuales():
         ORDER BY Dias_a_tiempo DESC
     """)
     datos = cursor.fetchall()
-    conectar.close()
     return datos
 
 
-def top_incidencias():
+def top_incidencias(cursor):
     """Muestra los empleados que mas faltan al trabajo"""
-    conectar = conexion.conexion()
-    cursor = conectar.cursor()
+
     cursor.execute("""
         SELECT TOP 5
             e.Nombres, e.Apellidos,
@@ -157,7 +131,6 @@ def top_incidencias():
         ORDER BY Total_incidencias DESC
     """)
     datos = cursor.fetchall()
-    conectar.close()
     return datos
 
 def generar_pie(presentes, tardanzas, ausentes):
@@ -187,11 +160,8 @@ def generar_pie(presentes, tardanzas, ausentes):
 
 
 
-def asistencia_semanal():
+def asistencia_semanal(cursor):
     """Permite obtener la asistencia semanal a traves de la base de datos"""
-
-    conectar = conexion.conexion()
-    cursor = conectar.cursor()
 
     cursor.execute("""
         SELECT a.Fecha, a.Estado, COUNT(*) AS Total
@@ -204,15 +174,14 @@ def asistencia_semanal():
 """)
     
     datos = cursor.fetchall()
-    conectar.close()
 
     return datos
 
 
-def generar_barchart():
+def generar_barchart(cursor):
     """Funcion que permite crear y madar el BarChart a vista_reportes""" 
 
-    datos = asistencia_semanal()
+    datos = asistencia_semanal(cursor)
 
     dias  = ["Lun", "Mar", "Mie", "Jue", "Vie"]  
     a_tiempo = [0, 0, 0, 0, 0]
@@ -261,12 +230,9 @@ def generar_barchart():
     plt.savefig("bar_asistencia.png", bbox_inches = "tight", facecolor = "#37474f")
     plt.close()
 
-def no_activos():
+def no_activos(cursor):
     """Muestra la cantidad de empleados que estan inactivos o en licencia para no ser contados en la 
     vista de reportes"""
-
-    conectar = conexion.conexion()
-    cursor = conectar.cursor()
 
     cursor.execute(
         """SELECT 
@@ -276,6 +242,4 @@ def no_activos():
             """)
     
     resultado = cursor.fetchone()
-    conectar.close()
-
     return resultado

@@ -13,22 +13,19 @@ def vista_reportes(page, cambio_menu):
     def actualizar_dashboard(e):
         """Permite actualizar los datos de la vista de reportes"""
 
-
-
     conectar = conexion.conexion()
+    cursor = conectar.cursor()
 
-    activos, total = reportes.total_empleados()
-    presentes = reportes.presentes()
-    tardanzas = reportes.tardanzas()
-    ausentes = reportes.ausentes()
-    sin_qr = reportes.sin_qr()
-    registros = reportes.ultimos_registros()
-    puntuales = reportes.top_puntuales()
-    incidencias = reportes.top_incidencias()
+    activos, total = reportes.total_empleados(cursor)
+    presentes = reportes.presentes(cursor)
+    tardanzas = reportes.tardanzas(cursor)
+    ausentes = reportes.ausentes(cursor)
+    sin_qr = reportes.sin_qr(cursor)
+    registros = reportes.ultimos_registros(cursor)
+    puntuales = reportes.top_puntuales(cursor)
+    incidencias = reportes.top_incidencias(cursor)
     reportes.generar_pie(presentes, tardanzas, ausentes)
-    reportes.generar_barchart()
-
-    conectar.close()
+    reportes.generar_barchart(cursor)
 
     lista_ranking = ft.Column(spacing = 6, controls = [])
 
@@ -553,7 +550,8 @@ def vista_reportes(page, cambio_menu):
 
     #Muestra los empleados inactivos o en licencia en una notificacion
 
-    licencia, inactivo = reportes.no_activos()
+    licencia, inactivo = reportes.no_activos(cursor)
+    conectar.close()
 
     licencia = licencia or 0
     inactivo = inactivo or 0
@@ -567,16 +565,16 @@ def vista_reportes(page, cambio_menu):
         if inactivo> 0:
             mensaje.append(f"{inactivo} inactivos")
         
-            snack = ft.SnackBar(
-                content = ft.Text(
-                    "Aviso: Hay " + " y ".join(mensaje) + ". No seran considarados en los reportes."
-                ),
-                bgcolor = ft.Colors.ORANGE_700
-            )
+        snack = ft.SnackBar(
+            content = ft.Text(
+                "Aviso: Hay " + " y ".join(mensaje) + ". No seran considarados en los reportes."
+            ),
+            bgcolor = ft.Colors.ORANGE_700
+        )
 
-            page.overlay.append(snack)
-            snack.open = True
-            page.update()
+        page.overlay.append(snack)
+        snack.open = True
+        page.update()
 
     return ft.Row(
         controls = [contenido],
