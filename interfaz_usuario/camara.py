@@ -7,6 +7,8 @@ import time
 import numpy as np
 import openpyxl as xl
 import os
+from pathlib import Path
+from platformdirs import user_documents_dir
 from datetime import datetime
 from pyzbar.pyzbar import decode
 from database import conexion
@@ -93,10 +95,8 @@ class CamaraApp(ft.Container):
                 self.capture = cv2.VideoCapture(0)
 
         cv2.namedWindow("Camara", cv2.WINDOW_NORMAL)
-        cv2.resizeWindow("Camara", 640, 480)
-        cv2.moveWindow("Camara", 900, 150)
+        cv2.setWindowProperty("Camara", cv2.WND_PROP_TOPMOST, 1)
 
-        #cv2.setWindowProperty("Camara", cv2.WND_PROP_TOPMOST, 1)
         
         while self.is_running:
             if self.capture is None or not self.capture.isOpened():
@@ -140,9 +140,13 @@ class CamaraApp(ft.Container):
                 try:
                     
                     codigo_qr = codes.data.decode('utf-8')
+                    print("QR leido: ", codigo_qr)
                     
                     from database.empleados import buscar_por_qr
+                    
                     empleado = buscar_por_qr(codigo_qr)
+
+                    print("Empleado encontrado:", empleado)
 
                     if not empleado:
                         mensaje_overlay = "QR no reconocido"
@@ -174,6 +178,8 @@ class CamaraApp(ft.Container):
                     xi, yi = codes.rect.left, codes.rect.top
                     pts = pts.reshape((-1, 1, 2))
                     cv2.polylines(frame, [pts], True, (255, 255, 0), 5)
+                    cv2.imshow("Camara", frame)
+                    cv2.waitKey(1)
                     
                     # Busca al empleado en la base de datos
                     self.lbl_nombre.value = nombre_completo
@@ -196,16 +202,9 @@ class CamaraApp(ft.Container):
                         else:
                             estado = "Tardanza"
 
-                    
-                        self.lbl_estado.value = f"{estado}"
-                        self.lbl_estado.color = ft.Colors.GREEN if estado == "A Tiempo" else ft.Colors.ORANGE
-                        self.lbl_estado.update()
-                        self.main_page.update()
-
-                        print("Estado que se guardará:", estado)
                         
-                        self._guardar_sql(id_empleado, estado)
-                        self._guardar_excel(nomar, estado, nombre_completo)
+                        guardado = self._guardar_sql(id_empleado, estado)
+                        if guardado:self._guardar_excel(nomar, estado, nombre_completo)
 
                         color_rect = (0, 255, 0)
                         mensaje_overlay = f"{nombre_completo} - {estado}"
@@ -213,24 +212,10 @@ class CamaraApp(ft.Container):
 
                         self.lbl_nombre.value = nombre_completo
                         self.lbl_nombre.color = ft.Colors.GREEN_ACCENT_400
-                        self.lbl_nombre.update()
-                        self.main_page.update()
-
-                        cv2.imshow("Camara", frame)
-
-                        cv2.putText(
-                            frame,
-                            f"{nombre_completo} - {estado}",
-                            (xi - 15, yi - 15),
-                            cv2.FONT_HERSHEY_SIMPLEX,
-                            1,
-                            (255, 255, 0),
-                            2
-                        )
-
-                        cv2.imshow("Camara", frame)
-                        cv2.waitKey(1)
-                        time.sleep(2.5)
+                        self.lbl_estado.value = f"{estado}"
+                        self.lbl_estado.color = ft.Colors.GREEN if estado == "A Tiempo" else ft.Colors.ORANGE
+                        
+                        time.sleep(2)
 
                         self.is_running = False
                         break
@@ -249,7 +234,7 @@ class CamaraApp(ft.Container):
                     (20, 460),
                     cv2.FONT_HERSHEY_SIMPLEX,
                     0.8,
-                    color_mensaje,
+                    (0, 255, 0),
                     2
                 )
 
@@ -262,19 +247,30 @@ class CamaraApp(ft.Container):
                 pass
             
             cv2.imshow("Camara", frame)
-            cv2.waitKey(1) #cierra con el teclado esc
+            cv2.waitKey(1)
             
             
         self.is_running = False
 
         if self.capture is not None:
            self.capture.release()
+           self.capture = None
 
         cv2.destroyAllWindows()
+        cv2.waitKey(1)
+        time.sleep(0.1)
+
+        self.lbl_nombre.update()
+        self.lbl_estado.update()
+        self.info_text.update()
+
 
     def _guardar_excel(self, nombre_base, nombre_hoja, codigo):
         """Esta función guarda la asitencia en un archivo de Excel"""
-        nombre_completo = f"{nombre_base}.xlsx"
+
+        carpeta = Path(user_documents_dir()) / "QR Assist" / "Registros_Asistencias"
+        carpeta.mkdir(parents = True, exist_ok = True)
+        nombre_completo = carpeta / f"{nombre_base}.xlsx"
         
          # Color utilizado para el encabezado
         color_encabezado = PatternFill(
@@ -334,11 +330,13 @@ class CamaraApp(ft.Container):
             
             # Guarda los cambios realizados en el archivo
             wb.save(nombre_completo)
+            
         except Exception as e:
             print(f"Error escribiendo en Excel: {e}")
     
 
     def _guardar_sql(self, id_empleado, estado):
+        """Esta funcion guarda los ponches de empleados en la base de datos"""
         
         conn = conexion.conexion()
         cursor = conn.cursor()
@@ -358,8 +356,10 @@ class CamaraApp(ft.Container):
 
         if existe > 0:
             conn.close()
-            return
+            return False
         
+        # Sentencia SQL para insertar los datos a la tabla de Asistencia
+
         cursor.execute("""INSERT INTO Asistencia
                        (
                         ID_Empleado,
@@ -379,6 +379,8 @@ class CamaraApp(ft.Container):
         conn.commit()
         cursor.close()
         conn.close()
+
+        return True
           
     def detener_camara(self):
         """Esta función detiene la cámara y libera los recursos utilizados"""

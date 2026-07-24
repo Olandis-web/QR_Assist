@@ -31,6 +31,8 @@ def login(page: ft.Page):
             id_empleado_login = resultado[1]
             rol = resultado[6]
 
+            # Aparece la pantalla de carga despues de insertar correctamente la contrasena y usuarios
+
             carga = ft.AlertDialog(
                 modal = True,
                 content = ft.Row(
@@ -52,6 +54,8 @@ def login(page: ft.Page):
 
             rol = resultado[6]
 
+            # El programa verifica si es administrador o empleado, dependiendo del rol se mostraran las pantallas
+
             if rol =="Administrador":
             
                 from interfaz.menu import vista_menu
@@ -63,6 +67,9 @@ def login(page: ft.Page):
                 from interfaz_usuario.menu_usuario import vista_menu
                 page.add(vista_menu(page, id_empleado_login))
                 page.update()
+
+            
+            # Se muestra la notificacion si el usuario o contrasena es incorrecto
                        
         else: 
             snack = ft.SnackBar(
@@ -72,6 +79,8 @@ def login(page: ft.Page):
             page.overlay.append(snack)
             snack.open = True
             page.update()
+
+    # Mini formulario de login
 
     user = ft.TextField(
     width = 300,

@@ -6,7 +6,9 @@ from database import conexion
 from database import empleados
 
 def crear_codigo():
+    """Crea un codigo QR aleatorio"""
 
+    # Codigos QR completamente aleatorios y de 16 digitos
     return ''.join(
         random.choices(
             string.ascii_uppercase + string.digits,
@@ -14,8 +16,10 @@ def crear_codigo():
         )
     )
 
+
 def vista_generar(page):
     '''Muestra el contenido de el formulario de empleados.'''
+
 
     def buscar(e):
         """Funcion para hacer funcionar la barra de busqueda"""
@@ -50,26 +54,39 @@ def vista_generar(page):
                                     generar_qr(e, empleado)
 
                                 )
-                                if not verifica_qr(empleado[0])
-
+                                if not empleado[4]
                                 else 
                                 ft.Text("Listo", color ="green")
                             ),
 
                             ft.DataCell(
                                 ft.IconButton(
-                                    icon = ft.Icons.VISIBILITY,
-                                    tooltip = "Ver QR",
+                                    icon = ft.Icons.PRINT,
+                                    tooltip = "Imprimir QR",
                                     icon_color = "white",
 
                                     on_click = lambda e, 
                                     empleado = empleado:
 
-                                    ver_qr(e, empleado)
+                                    imprimir_qr(e, empleado)
 
                                 )
-                            )
+                            ),
+
                             
+                            ft.DataCell(
+                                ft.IconButton(
+                                    icon = ft.Icons.DELETE,
+                                    tooltip = "Eliminar QR",
+
+                                    on_click = lambda e, 
+                                    empleado = empleado:
+
+                                    confirmacion_qr(e, empleado)
+                                )
+                                if empleado[4]
+                                else ft.Text("-")
+                            )  
                         ]
                     )
                 )
@@ -83,61 +100,100 @@ def vista_generar(page):
         on_submit = buscar
     )
 
-    id_empleado = None
+    filtro = ft.Dropdown(
+        label = "Filtrar estado",
+        width = 180,
+        value = "Todos",
+        options = [
+            ft.dropdown.Option("Todos"),
+            ft.dropdown.Option("Activo"),
+            ft.dropdown.Option("Inactivo"),
+            ft.dropdown.Option("Licencia")
+        ],
+        on_select = lambda e: actualiza_tabla()
+    )
 
-    def ver_qr(e, empleado):
-        """Funcion que sirve para ver el QR de los empleados (boton)"""
+    def imprimir_qr(e, empleado):
+        """Funcion que sirve para el QR temporal y lo envia a imprimir"""
 
-        ruta = f"qr/qr_{empleado[0]}.png"
+        from database.empleados import temporal_qr
 
-        carnet = ft.AlertDialog(
-            title = ft.Text("QR del empleado"),
+        codigo = empleado[4]
 
-            content = ft.Column(
-                tight = True,
-                controls = [
-                    ft.Text(
-                        f"{empleado[1]}_{empleado[2]}"
-                    ),
+        # Si no tiene codigo QR no puede imprimir
 
-                    ft.Image(
-                        src = ruta,
-                        width = 200,
-                        height = 200
-                    )
-                ]
+        if not codigo:
+            return
+
+        temporal_qr(codigo, empleado)
+
+    def confirmacion_qr(e, empleado):
+        """Muestra una ventanan para confirmar si desea eliminar el QR de un empleado"""
+
+        def eliminar_qr(id_empleado):
+            """Elimina el QR asignado al empleado"""
+
+            # Sentencias SQL para poder eliminar el QR del empleado
+
+            conectar = conexion.conexion()
+            cursor = conectar.cursor()
+
+            cursor.execute(
+                "Update Empleados SET Codigo_QR = NULL Where ID_Empleado = ?",
+                (id_empleado,)
             )
+
+            conectar.commit()
+            conectar.close()
+            dialog.open = False
+            actualiza_tabla()
+            datatable.update()
+            page.update()
+
+        def cerrar_confirmacion():
+            """Cierra la ventana de confirmacion de QR"""
+            dialog.open = False
+            page.update()
+
+        # Ventana de confirmacion
+
+        dialog = ft.AlertDialog(
+            modal=True,
+            title=ft.Text("Eliminar código QR"),
+            content=ft.Text(
+                f"¿Está seguro de eliminar el QR de {empleado[1]} {empleado[2]}?"
+            ),
+            actions=[
+                ft.ElevatedButton(
+                    "Cancelar",
+                    color="white",
+                    on_click=lambda e: cerrar_confirmacion()
+                ),
+                ft.ElevatedButton(
+                    "Eliminar",
+                    color="white",
+                    bgcolor="red",
+                    on_click=lambda e: eliminar_qr(empleado[0])
+                )
+            ]
         )
-        
-        page.overlay.append(carnet)
-        carnet.open = True
+
+        page.overlay.append(dialog)
+        dialog.open = True
         page.update()
-
-    def verifica_qr(id_empleado):
-        """Funcion para verificar si el empleado ya tiene un QR"""
-
-        conec = conexion.conexion()
-        cursor = conec.cursor()
-
-        cursor.execute("SELECT Codigo_qr from Empleados WHERE ID_Empleado = ?", (id_empleado,))
-
-        resultado = cursor.fetchone()
-        conec.close()
-
-        if resultado and resultado[0]:
-            return True
-        
-        return False
-
+    
 
     def actualiza_tabla():
         """Funcion que actualiza la tabla luego de insertar , actualizar o eliminar un empleado"""
 
+        filtro_estado = filtro.value
         datatable.rows.clear()
         for empleado in empleados.obtener_datos():
+                
+                if filtro_estado != "Todos" and empleado[5] != filtro_estado:
+                        continue
 
                 datatable.rows.append(
-
                     ft.DataRow(
 
                         cells = [
@@ -158,7 +214,7 @@ def vista_generar(page):
 
                                     generar_qr(e, empleado)
                                 )
-                                if not verifica_qr(empleado[0])
+                                if not empleado[4]
 
                                 else 
                                 ft.Text("Listo", color ="green")
@@ -166,14 +222,26 @@ def vista_generar(page):
 
                             ft.DataCell(
                                 ft.IconButton(
-                                    icon = ft.Icons.VISIBILITY,
-                                    tooltip = "Ver QR",
-                                    on_click = lambda e, empleado = empleado: ver_qr(e, empleado)
+                                    icon = ft.Icons.PRINT,
+                                    tooltip = "Imprimir QR",
+                                    on_click = lambda e, empleado = empleado: imprimir_qr(e, empleado)
                                 )
+                            ),
+
+                            ft.DataCell(
+                                ft.IconButton(
+                                    icon = ft.Icons.DELETE,
+                                    tooltip = "Eliminar QR",
+                                    on_click = lambda e, empleado = empleado: 
+                                    confirmacion_qr(e, empleado)
+                                )
+                                if empleado[4]
+                                else ft.Text(" -")
                             )
                         ]
-                    ) 
+                    )
                 )
+
 
     def guardar_qr(id_empleado, codigo_qr):
         """Funcion que sirve para guardar el QR a la tabla de empleados"""
@@ -187,77 +255,26 @@ def vista_generar(page):
         conec.close()
 
 
-    def cerrar_carnet(e, carnet):
-        """Sirve para cerrar la ventana del carnet"""
-        
-        carnet.open = False
-        page.update()
-
-
     def generar_qr (e, empleado):
         """Funcion que genera un QR aleatorio para los empleados y muestra su carnet"""
 
-        if verifica_qr(empleado[0]):
+        if empleado[4]:
             return 
 
         codigo = crear_codigo()
-        qr = qrcode.make(codigo)
-        ruta = f"qr/qr_{empleado[0]}.png"
-        qr.save(ruta)
         guardar_qr(empleado[0], codigo)
-        actualiza_tabla()
+        actualiza_tabla()    
         datatable.update()
 
 
-        carnet = ft.BottomSheet(
-
-            content = ft.Container(
-                width = 350,
-                height = 400,
-
-                content = ft.Column(
-  
-                    scroll = "auto",
-                    controls = [
-                        ft.Text(f"{empleado[1]} {empleado[2]}",
-                                size = 20,
-                                weight = "bold"),
-
-                            ft.Text(f"Cargo: {empleado[3]}"),
-
-                            ft.Text(f"Codigo: {codigo}"),
-
-                            ft.Container(
-                                width = 10,
-                                height = 10,
-
-                                content = ft.Image(
-                                    src = ruta,
-                                    fit = "fill"
-                                )
-                            ),
-
-                        ft.Row(
-                            alignment = ft.MainAxisAlignment.END,
-                            controls = [
-                                ft.TextButton(
-                                    "Imprimir",
-                                ),
-
-                                ft.TextButton(
-                                    "Cerrar",
-                                    on_click = lambda x: cerrar_carnet(e, carnet)
-                                )
-                            ]
-                        )
-                    ]
-                )
-            ),
+        snack = ft.SnackBar(
+            content = ft.Text(f"QR generado correctamente", color = "white"),
+            bgcolor = ft.Colors.GREEN
         )
-        page.overlay.append(carnet)
-        carnet.open = True
+        page.overlay.append(snack)
+        snack.open = True
         page.update()
-        
+
         
     datatable = ft.DataTable(
         expand = True,
@@ -275,12 +292,13 @@ def vista_generar(page):
                             ft.DataColumn(ft.Text("Cargo", color = "white", weight = "bold")),
                             ft.DataColumn(ft.Text("Estado", color = "white", weight = "bold")),
                             ft.DataColumn(ft.Text("Generar QR", color = "white", weight = "bold")),
-                            ft.DataColumn(ft.Text("Ver QR", color = "white", weight = "bold"))
+                            ft.DataColumn(ft.Text("Imprimir QR", color = "white", weight = "bold")),
+                            ft.DataColumn(ft.Text("Eliminar QR", color = "white", weight = "bold"))
                           ],
 
                         rows = []
     )     
-    actualiza_tabla()          
+    actualiza_tabla()        
 
     table = ft.Container(
         expand = True,
@@ -288,8 +306,15 @@ def vista_generar(page):
         padding = 20,
 
         content = ft.Column(
+            expand = True,
             controls = [
-                busqueda,
+
+                ft.Row(
+                    controls = [
+                        busqueda,
+                        filtro,
+                    ]
+                ),
 
                 ft.Column(
                     expand = True,
@@ -302,7 +327,7 @@ def vista_generar(page):
         )
     )
 
-    return ft.Column(
+    return ft.Row(
             controls = [
                 table
             ],
