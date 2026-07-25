@@ -142,12 +142,17 @@ def _grafico_pastel(titulo, valores, colores):
 
     eje.set_title(titulo, loc="left", fontsize=11, fontweight="bold", color="#17324D", pad=10)
     eje.set_aspect("equal")
-    buffer = BytesIO()
-    figura.savefig(buffer, format="png", bbox_inches="tight", facecolor="white")
+
+    # Guardar a un archivo temporal en lugar de BytesIO para evitar el error SRC_BYTES
+    import tempfile
+    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp:
+        ruta_tmp = tmp.name
+        figura.savefig(ruta_tmp, format="png", bbox_inches="tight", facecolor="white")
     plt.close(figura)
-    buffer.seek(0)
-    imagen = Image(buffer, width=8.8 * cm, height=5.55 * cm)
-    imagen._buffer = buffer  # Mantiene el contenido disponible hasta construir el PDF.
+
+    imagen = Image(ruta_tmp, width=8.8 * cm, height=5.55 * cm)
+    # Almacenar la ruta para limpiar después de construir el PDF
+    imagen._qr_temp_path = ruta_tmp
     return imagen
 
 
@@ -205,6 +210,17 @@ def _crear_reporte(nombre_archivo, titulo, descripcion, resumen, graficos, tabla
         Paragraph("Documento confidencial para uso administrativo.", estilos["pie"]),
     ]
     documento.build(historia, onFirstPage=_cabecera, onLaterPages=_cabecera)
+
+    # Limpiar archivos temporales de los gráficos
+    import os
+    for grafico in graficos:
+        ruta_tmp = getattr(grafico, "_qr_temp_path", None)
+        if ruta_tmp and os.path.exists(ruta_tmp):
+            try:
+                os.unlink(ruta_tmp)
+            except OSError:
+                pass
+
     return ruta
 
 
